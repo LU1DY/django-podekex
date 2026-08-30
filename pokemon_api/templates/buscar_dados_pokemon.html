@@ -1,361 +1,120 @@
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Buscar Pokémon</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+{% extends 'base.html' %}
+{% load pokemon_extras %}
 
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #fcf8f5;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 20px;
-      }
+{% block titulo %}Buscar Pokémon{% endblock %}
 
-      .container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 12px;
-        width: 100%;
-        max-width: 450px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        text-align: center;
-        margin-bottom: 20px;
-      }
+{% block estilos %}
+  .search-page h1 { font-size: 24px; margin-bottom: 4px; }
+  .search-page > p { color: var(--text-muted); margin-bottom: 20px; }
+  .search-box { display: flex; gap: 10px; margin-bottom: 20px; max-width: 600px; }
+  .search-box input { flex: 1; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--card-bg); font-size: 14px; }
+  .search-box input:focus { outline: none; border-color: var(--red); }
+  .erro-msg { color: var(--red); font-weight: bold; margin-bottom: 20px; }
 
-      h1 {
-        margin-bottom: 10px;
-        color: #333;
-      }
-      p {
-        color: #666;
-        margin-bottom: 25px;
-      }
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-      input {
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 16px;
-      }
-      input:focus {
-        outline: none;
-        border-color: #e3350d;
-      }
-      button {
-        padding: 12px;
-        background-color: #e3350d;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #c42d0b;
-      }
+  .result-card { padding: 28px; display: flex; gap: 28px; max-width: 900px; }
+  .result-image {
+    width: 180px; height: 180px; flex-shrink: 0; border-radius: var(--radius-sm);
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 14px 14px; display: flex; align-items: center; justify-content: center;
+  }
+  .result-image img { width: 130px; height: 130px; object-fit: contain; }
+  .result-info { flex: 1; }
+  .result-number { font-size: 12px; color: var(--text-muted); font-weight: bold; }
+  .result-info h2 { font-size: 22px; margin: 2px 0 10px; }
+  .result-types { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .result-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .result-meta-item { background: var(--bg); border-radius: var(--radius-sm); padding: 10px 14px; }
+  .result-meta-item span { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .result-meta-item strong { font-size: 14px; }
+  .result-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; margin-bottom: 22px; }
+  .stat-bar { display: flex; flex-direction: column; gap: 6px; }
+  .stat-bar-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+  .stat-bar-track { height: 6px; border-radius: 999px; background: #f1e9de; overflow: hidden; }
+  .stat-bar-fill { height: 100%; background: var(--red); border-radius: 999px; }
+{% endblock %}
 
-      .erro-msg {
-        color: #e3350d;
-        margin-top: 15px;
-        font-weight: bold;
-      }
+{% block conteudo %}
+<div class="search-page">
+  <h1>Encontre um Pokémon</h1>
+  <p>Informe o nome ou o ID do Pokémon</p>
 
-      /* --- ESTILOS DO CARD DA POKÉDEX --- */
-      .pokemon-card {
-        background-color: white;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        border: 1px solid #f0e6df;
-        display: flex;
-        padding: 24px;
-        width: 100%;
-        max-width: 800px;
-        gap: 24px;
-        align-items: center;
-      }
+  <form class="search-box" method="POST" action="{% url 'buscar_dados_pokemon' %}">
+    {% csrf_token %}
+    <input type="text" name="pokemon" placeholder="Ex: Pikachu ou 25" required />
+    <button type="submit" class="btn btn-primary">🔍 Buscar</button>
+  </form>
 
-      .image-container {
-        background-color: #f7f7f7;
-        background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
-        background-size: 16px 16px;
-        border-radius: 16px;
-        padding: 20px;
-        width: 200px;
-        height: 200px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-shrink: 0;
-      }
+  {% if erro %}
+    <p class="erro-msg">{{ erro }}</p>
+  {% endif %}
 
-      .image-container img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-      }
-
-      .info-container {
-        flex-grow: 1;
-        text-align: left;
-      }
-
-      .pokemon-id {
-        color: #8c8c8c;
-        font-size: 14px;
-        font-weight: bold;
-      }
-      .pokemon-nome {
-        color: #2c2c2c;
-        font-size: 28px;
-        font-weight: bold;
-        margin: 4px 0 10px 0;
-      }
-
-      .badge-tipo {
-        background-color: #fcefa1;
-        color: #635405;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: bold;
-        display: inline-block;
-        margin-bottom: 20px;
-      }
-
-      .specs-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 20px;
-      }
-
-      .spec-box {
-        background-color: #f5f5f5;
-        padding: 10px 14px;
-        border-radius: 12px;
-      }
-
-      .spec-label {
-        font-size: 11px;
-        color: #8c8c8c;
-        margin-bottom: 2px;
-      }
-      .spec-valor {
-        font-size: 14px;
-        color: #2c2c2c;
-        font-weight: bold;
-      }
-
-      .stats-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        column-gap: 30px;
-        row-gap: 12px;
-        margin-bottom: 25px;
-      }
-
-      .stat-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: relative;
-      }
-
-      .stat-name {
-        font-size: 12px;
-        color: #5c5c5c;
-        width: 60px;
-      }
-      .stat-value {
-        font-size: 13px;
-        color: #2c2c2c;
-        font-weight: bold;
-        text-align: right;
-        width: 30px;
-        z-index: 2;
-      }
-
-      /* Barra vermelha simulada abaixo dos valores */
-      .stat-bar-container {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-      .stat-line {
-        height: 4px;
-        background-color: #e3350d;
-        border-radius: 2px;
-      }
-
-      .btn-colecao {
-        background-color: #e3350d;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .btn-colecao:hover {
-        background-color: #c42d0b;
-      }
-
-      @media (max-width: 680px) {
-        .pokemon-card {
-          flex-direction: column;
-          text-align: center;
-        }
-        .info-container {
-          text-align: center;
-          width: 100%;
-        }
-        .stats-section {
-          grid-template-columns: 1fr;
-        }
-        .badge-tipo {
-          margin-bottom: 15px;
-        }
-        .btn-colecao {
-          margin: 0 auto;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Bloco 1: Caixa de Busca -->
-    <div class="container">
-      <h1>Buscar Pokémon</h1>
-      <p>Informe o nome ou o ID do Pokémon</p>
-      <form method="POST" action="{% url 'buscar_dados_pokemon' %}">
-        {% csrf_token %}
-        <input
-          type="text"
-          name="pokemon"
-          placeholder="Ex: Pikachu ou 25"
-          required
-        />
-        <button type="submit">Buscar</button>
-      </form>
-
-      {% if erro %}
-      <p class="erro-msg">{{ erro }}</p>
-      {% endif %}
-    </div>
-
-    <!-- Bloco 2: Card de Resultado (Só renderiza se houver um pokemon no contexto) -->
-    {% if pokemon %}
-    <div class="pokemon-card">
-      <div class="image-container">
+  {% if pokemon %}
+    <div class="card result-card">
+      <div class="result-image">
         <img src="{{ pokemon.sprite_url }}" alt="{{ pokemon.nome }}" />
       </div>
 
-      <div class="info-container">
-        <div class="pokemon-id">
-          #{{ pokemon.id_pokemon|stringformat:"03d" }}
-        </div>
-        <div class="pokemon-nome">{{ pokemon.nome }}</div>
+      <div class="result-info">
+        <span class="result-number">#{{ pokemon.id_pokemon|stringformat:"03d" }}</span>
+        <h2>{{ pokemon.nome }}</h2>
 
-        <div>
+        <div class="result-types">
           {% for tipo in pokemon.tipos %}
-          <span class="badge-tipo">{{ tipo|title }}</span>
+            <span class="type-badge">
+              <span class="dot" style="background: {{ tipo|cor_tipo }};"></span>
+              {{ tipo|title }}
+            </span>
           {% endfor %}
         </div>
 
-        <div class="specs-grid">
-          <div class="spec-box">
-            <div class="spec-label">Altura</div>
-            <div class="spec-valor">{{ pokemon.altura }} m</div>
+        <div class="result-meta">
+          <div class="result-meta-item">
+            <span>Altura</span>
+            <strong>{{ pokemon.altura }} m</strong>
           </div>
-          <div class="spec-box">
-            <div class="spec-label">Peso</div>
-            <div class="spec-valor">{{ pokemon.peso }} kg</div>
+          <div class="result-meta-item">
+            <span>Peso</span>
+            <strong>{{ pokemon.peso }} kg</strong>
           </div>
-          <div class="spec-box">
-            <div class="spec-label">Habilidade</div>
-            <div class="spec-valor">{{ pokemon.habilidades|join:" / " }}</div>
+          <div class="result-meta-item">
+            <span>Habilidade</span>
+            <strong>{{ pokemon.habilidades|join:" / " }}</strong>
+          </div>
+        </div>
+
+        <div class="result-stats">
+          <div class="stat-bar">
+            <div class="stat-bar-labels"><span>HP</span><span>{{ pokemon.hp }}</span></div>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill" style="width: calc(({{ pokemon.hp }} / 150) * 100%);"></div>
+            </div>
+          </div>
+          <div class="stat-bar">
+            <div class="stat-bar-labels"><span>Ataque</span><span>{{ pokemon.ataque }}</span></div>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill" style="width: calc(({{ pokemon.ataque }} / 150) * 100%);"></div>
+            </div>
+          </div>
+          <div class="stat-bar">
+            <div class="stat-bar-labels"><span>Defesa</span><span>{{ pokemon.defesa }}</span></div>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill" style="width: calc(({{ pokemon.defesa }} / 150) * 100%);"></div>
+            </div>
+          </div>
+          <div class="stat-bar">
+            <div class="stat-bar-labels"><span>Velocidade</span><span>{{ pokemon.velocidade }}</span></div>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill" style="width: calc(({{ pokemon.velocidade }} / 150) * 100%);"></div>
+            </div>
           </div>
         </div>
 
-        <div class="stats-section">
-          <div class="stat-bar-container">
-            <div class="stat-row">
-              <span class="stat-name">HP</span>
-              <span class="stat-value">{{ pokemon.hp }}</span>
-            </div>
-            <!-- Proporção visual baseada em um valor máximo de 150 -->
-            <div
-              class="stat-line"
-              style="width: calc(({{ pokemon.hp }} / 150) * 100%);"
-            ></div>
-          </div>
-
-          <div class="stat-bar-container">
-            <div class="stat-row">
-              <span class="stat-name">Ataque</span>
-              <span class="stat-value">{{ pokemon.ataque }}</span>
-            </div>
-            <div
-              class="stat-line"
-              style="width: calc(({{ pokemon.ataque }} / 150) * 100%);"
-            ></div>
-          </div>
-
-          <div class="stat-bar-container">
-            <div class="stat-row">
-              <span class="stat-name">Defesa</span>
-              <span class="stat-value">{{ pokemon.defesa }}</span>
-            </div>
-            <div
-              class="stat-line"
-              style="width: calc(({{ pokemon.defesa }} / 150) * 100%);"
-            ></div>
-          </div>
-
-          <div class="stat-bar-container">
-            <div class="stat-row">
-              <span class="stat-name">Velocidade</span>
-              <span class="stat-value">{{ pokemon.velocidade }}</span>
-            </div>
-            <div
-              class="stat-line"
-              style="width: calc(({{ pokemon.velocidade }} / 150) * 100%);"
-            ></div>
-          </div>
-        </div>
         <form method="GET" action="{% url 'salvar_pokemon' %}">
-          <input
-            type="hidden"
-            name="id_pokemon"
-            value="{{ pokemon.id_pokemon }}"
-          />
-          <button type="submit" class="btn-colecao">
-            + Adicionar à minha coleção
-          </button>
+          <input type="hidden" name="id_pokemon" value="{{ pokemon.id_pokemon }}" />
+          <button type="submit" class="btn btn-primary">+ Adicionar à minha coleção</button>
         </form>
       </div>
     </div>
-    {%endif%}
-  </body>
-</html>
+  {% endif %}
+</div>
+{% endblock %}
