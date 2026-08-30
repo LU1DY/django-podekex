@@ -34,6 +34,19 @@ def buscar_pokemon(request):
 
     return render(request, "buscar_dados_pokemon.html", {"pokemon": pokemon, "erro": erro})
 
+def home(request):
+    pokemons = Pokemon.objects.all()
+
+    favoritos = pokemons.filter(favorito=True)
+
+    contexto = {
+        'total_colecao': pokemons.count(),
+        'total_favoritos': favoritos.count(),
+        'tipos_descobertos': pokemons.values_list('tipos', flat=True).distinct().count(),
+        'favoritos': favoritos[:3],
+    }
+    return render(request, 'home.html', contexto)
+
 # C - POST 
 def salvar_pokemon(request):
     pokemon = None  

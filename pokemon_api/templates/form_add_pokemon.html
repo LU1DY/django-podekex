@@ -1,383 +1,160 @@
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cadastrar Novo Pokémon</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+{% extends 'base.html' %}
 
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #fcf8f5;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 40px 20px;
-      }
+{% block titulo %}Cadastrar Pokémon{% endblock %}
 
-      .form-container {
-        background-color: white;
-        padding: 40px;
-        border-radius: 16px;
-        width: 100%;
-        max-width: 650px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      }
+{% block estilos %}
+  .edit-page h1 { font-size: 24px; }
+  .edit-page > p { color: var(--text-muted); margin-bottom: 20px; }
+  .form-section { padding: 24px; margin-bottom: 20px; max-width: 900px; }
+  .form-section-title {
+    font-size: 12px; font-weight: bold; color: var(--text-muted);
+    letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .form-field label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+  .form-field input, .form-field textarea {
+    width: 100%; padding: 10px 12px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--bg); font-size: 14px;
+  }
+  .form-field input:focus, .form-field textarea:focus { outline: none; border-color: var(--red); }
+  .form-field textarea { resize: vertical; min-height: 80px; }
+  .repeat-field { display: flex; flex-direction: column; gap: 8px; }
+  .preview-img { margin-top: 8px; width: 80px; height: 80px; object-fit: contain; background: var(--bg); border-radius: var(--radius-sm); padding: 6px; }
 
-      h1 {
-        color: #2c2c2c;
-        font-size: 26px;
-        margin-bottom: 8px;
-        text-align: center;
-      }
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; }
+  .toggle-row + .toggle-row { border-top: 1px solid var(--border); }
+  .toggle-row strong { display: block; font-size: 14px; }
+  .toggle-row .hint { font-size: 12px; color: var(--text-muted); }
+  .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch-track { position: absolute; inset: 0; background: var(--border); border-radius: 999px; cursor: pointer; transition: background 0.15s; }
+  .switch-track::before {
+    content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px;
+    background: white; border-radius: 50%; transition: transform 0.15s;
+  }
+  .switch input:checked + .switch-track { background: var(--red); }
+  .switch input:checked + .switch-track::before { transform: translateX(20px); }
 
-      .subtitle {
-        color: #666;
-        font-size: 14px;
-        text-align: center;
-        margin-bottom: 30px;
-      }
+  .form-actions { display: flex; justify-content: flex-end; gap: 10px; max-width: 900px; }
+{% endblock %}
 
-      .section-title {
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #8c8c8c;
-        margin: 25px 0 15px 0;
-        border-bottom: 1px solid #f0e6df;
-        padding-bottom: 6px;
-      }
+{% block conteudo %}
+<div class="edit-page">
+  <h1>Cadastrar Pokémon</h1>
+  <p>Insira as informações para registrar o monstrinho na sua base de dados.</p>
 
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-      }
+  <form action="{% url 'salvar_pokemon' %}" method="POST">
+    {% csrf_token %}
 
-      .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
+    <div class="card form-section">
+      <div class="form-section-title">Dados principais</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="id_nome">Nome</label>
+          <input type="text" id="id_nome" name="nome" placeholder="Ex: Bulbasaur" required maxlength="100" value="{{ pokemon.nome }}" />
+        </div>
+        <div class="form-field">
+          <label for="id_pokemon">Número da Pokédex</label>
+          <input type="number" id="id_pokemon" name="id_pokemon" placeholder="Ex: 1" required min="1" value="{{ pokemon.id_pokemon }}" />
+        </div>
+      </div>
 
-      .full-width {
-        grid-column: span 2;
-      }
-
-      label {
-        font-size: 14px;
-        font-weight: bold;
-        color: #4a4a4a;
-      }
-
-      input[type="text"],
-      input[type="number"],
-      input[type="url"],
-      textarea {
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 15px;
-        color: #333;
-        transition: border-color 0.2s;
-      }
-
-      input:focus,
-      textarea:focus {
-        outline: none;
-        border-color: #e3350d;
-      }
-
-      textarea {
-        resize: vertical;
-        min-height: 100px;
-      }
-
-      /* Container específico para os Atributos (Stats) ficarem em 4 colunas */
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-      }
-
-      /* Customização dos botões de Checkbox/Switch */
-      .checkbox-group {
-        display: flex;
-        gap: 30px;
-        margin-top: 10px;
-      }
-
-      .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-        font-weight: normal;
-      }
-
-      .checkbox-label input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: #e3350d;
-        cursor: pointer;
-      }
-
-      .actions {
-        margin-top: 35px;
-        display: flex;
-        gap: 15px;
-        justify-content: flex-end;
-      }
-
-      .btn {
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-size: 15px;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        text-align: center;
-        transition: background-color 0.2s;
-      }
-
-      .btn-submit {
-        background-color: #e3350d;
-        color: white;
-        border: none;
-      }
-
-      .btn-submit:hover {
-        background-color: #c42d0b;
-      }
-
-      .btn-cancel {
-        background-color: #f5f5f5;
-        color: #666;
-        border: 1px solid #ccc;
-      }
-
-      .btn-cancel:hover {
-        background-color: #e8e8e8;
-      }
-
-      @media (max-width: 600px) {
-        .form-grid {
-          grid-template-columns: 1fr;
-        }
-        .full-width {
-          grid-column: span 1;
-        }
-        .stats-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .actions {
-          flex-direction: column-reverse;
-        }
-        .btn {
-          width: 100%;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="form-container">
-      <h1>Cadastrar Pokémon</h1>
-      <p class="subtitle">
-        Insira as informações para registrar o monstrinho na sua base de dados
-      </p>
-
-      <!-- Substitua 'sua_view_salvar_manual' pelo name correto da sua rota no Django -->
-      <form action="{% url 'salvar_pokemon' %}" method="POST">
-        {% csrf_token %}
-
-        <!-- Seção 1: Dados Gerais -->
-        <div class="section-title">Dados Principais</div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="id_nome">Nome</label>
-            <input
-              type="text"
-              id="id_nome"
-              name="nome"
-              placeholder="Ex: Bulbasaur"
-              required
-              maxlength="100"
-              value="{{pokemon.nome}}"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="id_pokemon">Número da Pokédex</label>
-            <input
-              type="number"
-              id="id_pokemon"
-              name="id_pokemon"
-              placeholder="Ex: 1"
-              required
-              min="1"
-              value="{{pokemon.id_pokemon}}"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="id_tipos">Tipo</label>
-            {%for tipo in pokemon.tipos %}
-            <input
-              type="text"
-              id="id_tipos"
-              name="tipos"
-              placeholder="Ex: Grass / Poison"
-              required
-              maxlength="50"
-              value="{{tipo}}"
-            />
-            {%endfor%}
-          </div>
-
-          <div class="form-group">
-            <label for="id_habilidades">Habilidade</label>
-            {% for habilidade in pokemon.habilidades %}
-            <input
-              type="text"
-              id="id_habilidades"
-              name="habilidades"
-              placeholder="Ex: Overgrow"
-              maxlength="150"
-              value="{{habilidade}}"
-            />
+      <div class="form-row">
+        <div class="form-field">
+          <label>Tipo</label>
+          <div class="repeat-field">
+            {% for tipo in pokemon.tipos %}
+              <input type="text" name="tipos" placeholder="Ex: Grass / Poison" required maxlength="50" value="{{ tipo }}" />
             {% endfor %}
           </div>
-
-          <div class="form-group">
-            <label for="id_altura">Altura</label>
-            <input
-              type="text"
-              id="id_altura"
-              name="altura"
-              placeholder="Ex: 0.7 m"
-              maxlength="20"
-              value="{{pokemon.altura}}"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="id_peso">Peso</label>
-            <input
-              type="text"
-              id="id_peso"
-              name="peso"
-              placeholder="Ex: 6.9 kg"
-              maxlength="20"
-              value="{{pokemon.peso}}"
-            />
+        </div>
+        <div class="form-field">
+          <label>Habilidade</label>
+          <div class="repeat-field">
+            {% for habilidade in pokemon.habilidades %}
+              <input type="text" name="habilidades" placeholder="Ex: Overgrow" maxlength="150" value="{{ habilidade }}" />
+            {% endfor %}
           </div>
         </div>
+      </div>
 
-        <!-- Seção 2: Atributos de Combate -->
-        <div class="section-title">Atributos Base (Stats)</div>
-        <div class="stats-grid">
-          <div class="form-group">
-            <label for="id_hp">HP</label>
-            <input
-              type="number"
-              id="id_hp"
-              name="hp"
-              min="0"
-              value="{{pokemon.hp}}"
-            />
-          </div>
-          <div class="form-group">
-            <label for="id_ataque">Ataque</label>
-            <input
-              type="number"
-              id="id_ataque"
-              name="ataque"
-              min="0"
-              value="{{pokemon.ataque}}"
-            />
-          </div>
-          <div class="form-group">
-            <label for="id_defesa">Defesa</label>
-            <input
-              type="number"
-              id="id_defesa"
-              name="defesa"
-              value="{{pokemon.defesa}}"
-              min="0"
-            />
-          </div>
-          <div class="form-group">
-            <label for="id_velocidade">Velocidade</label>
-            <input
-              type="number"
-              id="id_velocidade"
-              name="velocidade"
-              value="{{pokemon.velocidade}}"
-              min="0"
-            />
-          </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="id_altura">Altura</label>
+          <input type="text" id="id_altura" name="altura" placeholder="Ex: 0.7 m" maxlength="20" value="{{ pokemon.altura }}" />
         </div>
-
-        <!-- Seção 3: Imagem e Notas -->
-        <div class="section-title">Mídia e Notas</div>
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label for="sprite_url">Imagem do Pokémon (Sprite)</label>
-
-            <!-- 1. Área de pré-visualização da imagem atual -->
-            <div class="form-group full-width">
-              <label for="id_sprite_url">URL da Imagem (Sprite)</label>
-              <input
-                type="url"
-                name="sprite_url"
-                id="sprite_url"
-                value="{{pokemon.sprite_url}}"
-              />
-              <img src="{{pokemon.sprite_url}}" alt="">
-            </div>
-
-          </div>
-
-          <div class="form-group full-width">
-            <label for="id_observacoes">Observações</label>
-            <textarea
-              id="id_observacoes"
-              name="observacoes"
-              placeholder="Escreva notas sobre táticas de batalha, onde foi encontrado, etc."
-            ></textarea>
-          </div>
+        <div class="form-field">
+          <label for="id_peso">Peso</label>
+          <input type="text" id="id_peso" name="peso" placeholder="Ex: 6.9 kg" maxlength="20" value="{{ pokemon.peso }}" />
         </div>
-
-        <!-- Seção 4: Status de Inventário -->
-        <div class="section-title">Coleção</div>
-        <div class="checkbox-group">
-          <label class="checkbox-label" for="id_capturado">
-            <input type="checkbox" id="id_capturado" name="capturado" />
-            <span>Marcar como <strong>Capturado</strong></span>
-          </label>
-
-          <label class="checkbox-label" for="id_favorito">
-            <input type="checkbox" id="id_favorito" name="favorito" />
-            <span>Adicionar aos <strong>Favoritos</strong></span>
-          </label>
-        </div>
-
-        <!-- Botões de Ação -->
-        <div class="actions">
-          <!-- Substitua o href pela rota da sua listagem ou busca -->
-          <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-cancel"
-            >Cancelar</a
-          >
-
-          <button type="submit" class="btn btn-submit">Salvar Pokémon</button>
-        </div>
-      </form>
+      </div>
     </div>
-  </body>
-</html>
+
+    <div class="card form-section">
+      <div class="form-section-title">Atributos base (stats)</div>
+      <div class="form-row cols-4">
+        <div class="form-field">
+          <label for="id_hp">HP</label>
+          <input type="number" id="id_hp" name="hp" min="0" value="{{ pokemon.hp }}" />
+        </div>
+        <div class="form-field">
+          <label for="id_ataque">Ataque</label>
+          <input type="number" id="id_ataque" name="ataque" min="0" value="{{ pokemon.ataque }}" />
+        </div>
+        <div class="form-field">
+          <label for="id_defesa">Defesa</label>
+          <input type="number" id="id_defesa" name="defesa" min="0" value="{{ pokemon.defesa }}" />
+        </div>
+        <div class="form-field">
+          <label for="id_velocidade">Velocidade</label>
+          <input type="number" id="id_velocidade" name="velocidade" min="0" value="{{ pokemon.velocidade }}" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Mídia e notas</div>
+      <div class="form-field" style="margin-bottom: 16px;">
+        <label for="id_sprite_url">URL da imagem (sprite)</label>
+        <input type="url" name="sprite_url" id="id_sprite_url" value="{{ pokemon.sprite_url }}" />
+        {% if pokemon.sprite_url %}
+          <img class="preview-img" src="{{ pokemon.sprite_url }}" alt="Pré-visualização" />
+        {% endif %}
+      </div>
+      <div class="form-field">
+        <label for="id_observacoes">Observações</label>
+        <textarea id="id_observacoes" name="observacoes" placeholder="Escreva notas sobre táticas de batalha, onde foi encontrado, etc."></textarea>
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="toggle-row">
+        <div>
+          <strong>Capturado</strong>
+          <span class="hint">Marque se o Pokémon já está com você.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="id_capturado" name="capturado" />
+          <span class="switch-track"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <strong>Favorito</strong>
+          <span class="hint">Destacar na página inicial.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="id_favorito" name="favorito" />
+          <span class="switch-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-secondary">✕ Cancelar</a>
+      <button type="submit" class="btn btn-primary">💾 Salvar Pokémon</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

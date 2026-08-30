@@ -1,0 +1,37 @@
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-logo">
+      <div class="ball"></div>
+      <div>
+        <h1>Pokédex</h1>
+        <span>Minha Coleção de Treinador</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a
+        href="{% url 'home' %}"
+        class="sidebar-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}"
+        >🏠 Início</a
+      >
+      <a
+        href="{% url 'buscar_dados_pokemon' %}"
+        class="sidebar-link{% if request.resolver_match.url_name == 'buscar_dados_pokemon' %} active{% endif %}"
+        >🔍 Buscar Pokémon</a
+      >
+      <a
+        href="{% url 'listar_pokemons' %}"
+        class="sidebar-link{% if request.resolver_match.url_name == 'listar_pokemons' %} active{% endif %}"
+        >📖 Minha Coleção</a
+      >
+    </nav>
+  </div>
+
+  <div class="sidebar-trainer">
+    <div class="avatar">T</div>
+    <div>
+      <div class="name">Treinador</div>
+      <div class="detail">Kanto · Nível 34</div>
+    </div>
+  </div>
+</aside>
