@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minha Coleção de Pokémon</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #fcf8f5;
+        color: #333;
+        padding: 40px 20px;
+        min-height: 100vh;
+      }
+
+      .header-container {
+        max-width: 1200px;
+        margin: 0 auto 30px auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #f0e6df;
+        padding-bottom: 20px;
+      }
+
+      h1 {
+        color: #2c2c2c;
+        font-size: 28px;
+      }
+
+      .btn-buscar {
+        background-color: #e3350d;
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: background-color 0.2s;
+      }
+
+      .btn-buscar:hover {
+        background-color: #c42d0b;
+      }
+
+      /* Grid da Galeria */
+      .pokemon-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+      }
+
+      /* Card do Pokémon */
+      .pokemon-card {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f0e6df;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .pokemon-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Indicadores de Status (Favorito/Capturado) */
+      .card-badges {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: flex;
+        gap: 6px;
+        z-index: 2;
+      }
+
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .badge-fav {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+      }
+      .badge-cap {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      /* Container da Imagem */
+      .card-image-bg {
+        background-color: #f7f7f7;
+        background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+        background-size: 12px 12px;
+        height: 180px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+      }
+
+      .card-image-bg img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+      }
+
+      /* Corpo das Informações */
+      .card-content {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      }
+
+      .poke-id {
+        color: #8c8c8c;
+        font-size: 13px;
+        font-weight: bold;
+      }
+
+      .poke-nome {
+        font-size: 22px;
+        color: #2c2c2c;
+        font-weight: bold;
+        margin: 2px 0 8px 0;
+      }
+
+      .poke-tipo {
+        background-color: #f1f3f5;
+        color: #495057;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 15px;
+        align-self: flex-start;
+      }
+
+      /* Atributos Base Compactos */
+      .poke-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        border-top: 1px solid #f8f9fa;
+        border-bottom: 1px solid #f8f9fa;
+        padding: 12px 0;
+        margin-bottom: 12px;
+      }
+
+      .stat-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .stat-item strong {
+        color: #2c2c2c;
+      }
+
+      /* Observações */
+      .poke-obs {
+        font-size: 12px;
+        color: #777;
+        font-style: italic;
+        line-height: 1.4;
+        flex-grow: 1;
+        margin-bottom: 15px;
+        background-color: #fffdfb;
+        padding: 8px;
+        border-left: 2px solid #e3350d;
+        border-radius: 0 4px 4px 0;
+      }
+
+      /* Ações do Card */
+      .card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: auto;
+      }
+
+      .btn-card {
+        flex-grow: 1;
+        padding: 10px;
+        font-size: 13px;
+        font-weight: bold;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        transition: background-color 0.2s;
+      }
+
+      .btn-editar {
+        background-color: #f1f3f5;
+        color: #495057;
+      }
+
+      .btn-editar:hover {
+        background-color: #e9ecef;
+      }
+
+      .btn-remover {
+        background-color: #fff5f5;
+        color: #e3350d;
+        border: 1px solid #ffe3e3;
+      }
+
+      .btn-remover:hover {
+        background-color: #ffe3e3;
+      }
+
+      /* Estado Vazio */
+      .empty-state {
+        max-width: 500px;
+        margin: 80px auto;
+        text-align: center;
+        background-color: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .empty-state p {
+        color: #666;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Topo da Página -->
+    <div class="header-container">
+      <div>
+        <h1>Minha Pokédex</h1>
+        <p style="color: #666; font-size: 14px; margin-top: 4px">
+          Você possui {{ pokemons|length }} monstrinho(s) salvo(s)
+        </p>
+      </div>
+      <a href="{% url 'buscar_dados_pokemon' %}" class="btn-buscar"
+        >+ Buscar Novo</a
+      >
+    </div>
+
+    <!-- Lista de Pokémon -->
+    {% if pokemons %}
+    <div class="pokemon-grid">
+      {% for pokemon in pokemons %}
+      <div class="pokemon-card">
+        <!-- Indicadores de Favorito e Capturado -->
+        <div class="card-badges">
+          {% if pokemon.favorito %}
+          <span class="status-badge badge-fav">⭐ Fav</span>
+          {% endif %} {% if pokemon.capturado %}
+          <span class="status-badge badge-cap">🎒 Cap</span>
+          {% endif %}
+        </div>
+
+        <!-- Imagem -->
+        <div class="card-image-bg">
+          <img src="{{ pokemon.sprite_url }}" alt="{{ pokemon.nome }}" />
+        </div>
+
+        <!-- Dados Técnicos -->
+        <div class="card-content">
+          <span class="poke-id"
+            >#{{ pokemon.id_pokemon|stringformat:"03d" }}</span
+          >
+          <h2 class="poke-nome">{{ pokemon.nome }}</h2>
+          <span class="poke-tipo">{{ pokemon.tipos }}</span>
+
+          <!-- Atributos base -->
+          <div class="poke-stats">
+            <div class="stat-item">
+              <span>HP:</span> <strong>{{ pokemon.hp }}</strong>
+            </div>
+            <div class="stat-item">
+              <span>ATK:</span> <strong>{{ pokemon.ataque }}</strong>
+            </div>
+            <div class="stat-item">
+              <span>DEF:</span> <strong>{{ pokemon.defesa }}</strong>
+            </div>
+            <div class="stat-item">
+              <span>SPD:</span> <strong>{{ pokemon.velocidade }}</strong>
+            </div>
+          </div>
+
+          <!-- Se houver observações, exibe a caixinha -->
+          {% if pokemon.observacoes %}
+          <p class="poke-obs">{{ pokemon.observacoes }}</p>
+          {% endif %}
+
+          <!-- Botões de Gerenciamento -->
+          <div class="card-actions">
+            <!-- Link para a View de Edição passando o ID do banco -->
+            <a href="" class="btn-card btn-editar">Editar</a>
+
+            <!-- Link para a View de Remoção passando o ID do banco -->
+            <a
+              href=""
+              class="btn-card btn-remover"
+              onclick="return confirm('Deseja realmente remover o {{ pokemon.nome }} da sua coleção?')"
+              >Remover</a
+            >
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- Mensagem amigável caso não tenha nenhum Pokémon cadastrado -->
+    <div class="empty-state">
+      <h2 style="margin-bottom: 10px; color: #4a4a4a">
+        Nenhum Pokémon por aqui...
+      </h2>
+      <p>
+        Sua coleção está vazia. Comece pesquisando e adicionando seus
+        monstrinhos favoritos!
+      </p>
+    </div>
+    {%endif%}
+  </body>
+</html>

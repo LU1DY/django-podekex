@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastrar Novo Pokémon</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #fcf8f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .form-container {
+        background-color: white;
+        padding: 40px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 650px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        color: #2c2c2c;
+        font-size: 26px;
+        margin-bottom: 8px;
+        text-align: center;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .section-title {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #8c8c8c;
+        margin: 25px 0 15px 0;
+        border-bottom: 1px solid #f0e6df;
+        padding-bottom: 6px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .full-width {
+        grid-column: span 2;
+      }
+
+      label {
+        font-size: 14px;
+        font-weight: bold;
+        color: #4a4a4a;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="url"],
+      textarea {
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+        color: #333;
+        transition: border-color 0.2s;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #e3350d;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      /* Container específico para os Atributos (Stats) ficarem em 4 colunas */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      /* Customização dos botões de Checkbox/Switch */
+      .checkbox-group {
+        display: flex;
+        gap: 30px;
+        margin-top: 10px;
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-weight: normal;
+      }
+
+      .checkbox-label input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #e3350d;
+        cursor: pointer;
+      }
+
+      .actions {
+        margin-top: 35px;
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: background-color 0.2s;
+      }
+
+      .btn-submit {
+        background-color: #e3350d;
+        color: white;
+        border: none;
+      }
+
+      .btn-submit:hover {
+        background-color: #c42d0b;
+      }
+
+      .btn-cancel {
+        background-color: #f5f5f5;
+        color: #666;
+        border: 1px solid #ccc;
+      }
+
+      .btn-cancel:hover {
+        background-color: #e8e8e8;
+      }
+
+      @media (max-width: 600px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .full-width {
+          grid-column: span 1;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .actions {
+          flex-direction: column-reverse;
+        }
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <h1>Cadastrar Pokémon</h1>
+      <p class="subtitle">
+        Insira as informações para registrar o monstrinho na sua base de dados
+      </p>
+
+      <!-- Substitua 'sua_view_salvar_manual' pelo name correto da sua rota no Django -->
+      <form action="{% url 'salvar_pokemon' %}" method="POST">
+        {% csrf_token %}
+
+        <!-- Seção 1: Dados Gerais -->
+        <div class="section-title">Dados Principais</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="id_nome">Nome</label>
+            <input
+              type="text"
+              id="id_nome"
+              name="nome"
+              placeholder="Ex: Bulbasaur"
+              required
+              maxlength="100"
+              value="{{pokemon.nome}}"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="id_pokemon">Número da Pokédex</label>
+            <input
+              type="number"
+              id="id_pokemon"
+              name="id_pokemon"
+              placeholder="Ex: 1"
+              required
+              min="1"
+              value="{{pokemon.id_pokemon}}"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="id_tipos">Tipo</label>
+            {%for tipo in pokemon.tipos %}
+            <input
+              type="text"
+              id="id_tipos"
+              name="tipos"
+              placeholder="Ex: Grass / Poison"
+              required
+              maxlength="50"
+              value="{{tipo}}"
+            />
+            {%endfor%}
+          </div>
+
+          <div class="form-group">
+            <label for="id_habilidades">Habilidade</label>
+            {% for habilidade in pokemon.habilidades %}
+            <input
+              type="text"
+              id="id_habilidades"
+              name="habilidades"
+              placeholder="Ex: Overgrow"
+              maxlength="150"
+              value="{{habilidade}}"
+            />
+            {% endfor %}
+          </div>
+
+          <div class="form-group">
+            <label for="id_altura">Altura</label>
+            <input
+              type="text"
+              id="id_altura"
+              name="altura"
+              placeholder="Ex: 0.7 m"
+              maxlength="20"
+              value="{{pokemon.altura}}"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="id_peso">Peso</label>
+            <input
+              type="text"
+              id="id_peso"
+              name="peso"
+              placeholder="Ex: 6.9 kg"
+              maxlength="20"
+              value="{{pokemon.peso}}"
+            />
+          </div>
+        </div>
+
+        <!-- Seção 2: Atributos de Combate -->
+        <div class="section-title">Atributos Base (Stats)</div>
+        <div class="stats-grid">
+          <div class="form-group">
+            <label for="id_hp">HP</label>
+            <input
+              type="number"
+              id="id_hp"
+              name="hp"
+              min="0"
+              value="{{pokemon.hp}}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="id_ataque">Ataque</label>
+            <input
+              type="number"
+              id="id_ataque"
+              name="ataque"
+              min="0"
+              value="{{pokemon.ataque}}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="id_defesa">Defesa</label>
+            <input
+              type="number"
+              id="id_defesa"
+              name="defesa"
+              value="{{pokemon.defesa}}"
+              min="0"
+            />
+          </div>
+          <div class="form-group">
+            <label for="id_velocidade">Velocidade</label>
+            <input
+              type="number"
+              id="id_velocidade"
+              name="velocidade"
+              value="{{pokemon.velocidade}}"
+              min="0"
+            />
+          </div>
+        </div>
+
+        <!-- Seção 3: Imagem e Notas -->
+        <div class="section-title">Mídia e Notas</div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="sprite_url">Imagem do Pokémon (Sprite)</label>
+
+            <!-- 1. Área de pré-visualização da imagem atual -->
+            <div class="form-group full-width">
+              <label for="id_sprite_url">URL da Imagem (Sprite)</label>
+              <input
+                type="url"
+                name="sprite_url"
+                id="sprite_url"
+                value="{{pokemon.sprite_url}}"
+              />
+              <img src="{{pokemon.sprite_url}}" alt="">
+            </div>
+
+          </div>
+
+          <div class="form-group full-width">
+            <label for="id_observacoes">Observações</label>
+            <textarea
+              id="id_observacoes"
+              name="observacoes"
+              placeholder="Escreva notas sobre táticas de batalha, onde foi encontrado, etc."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Seção 4: Status de Inventário -->
+        <div class="section-title">Coleção</div>
+        <div class="checkbox-group">
+          <label class="checkbox-label" for="id_capturado">
+            <input type="checkbox" id="id_capturado" name="capturado" />
+            <span>Marcar como <strong>Capturado</strong></span>
+          </label>
+
+          <label class="checkbox-label" for="id_favorito">
+            <input type="checkbox" id="id_favorito" name="favorito" />
+            <span>Adicionar aos <strong>Favoritos</strong></span>
+          </label>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="actions">
+          <!-- Substitua o href pela rota da sua listagem ou busca -->
+          <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-cancel"
+            >Cancelar</a
+          >
+
+          <button type="submit" class="btn btn-submit">Salvar Pokémon</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
