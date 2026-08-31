@@ -44,15 +44,19 @@
   <h1>Cadastrar Pokémon</h1>
   <p>Insira as informações para registrar o monstrinho na sua base de dados.</p>
 
-  <form action="{% url 'salvar_pokemon' %}" method="POST">
+  <form method="POST">
     {% csrf_token %}
+
+    {% if titulo %}
+    <h2>Editando {{titulo}}</h2>
+    {%endif%}
 
     <div class="card form-section">
       <div class="form-section-title">Dados principais</div>
       <div class="form-row">
         <div class="form-field">
           <label for="id_nome">Nome</label>
-          <input type="text" id="id_nome" name="nome" placeholder="Ex: Bulbasaur" required maxlength="100" value="{{ pokemon.nome }}" />
+          <input type="text" id="id_nome" name="nome" placeholder="Ex: Bulbasaur" required maxlength="100" value="{{ pokemon.nome|default:'' }}" />
         </div>
         <div class="form-field">
           <label for="id_pokemon">Número da Pokédex</label>
@@ -124,7 +128,7 @@
       </div>
       <div class="form-field">
         <label for="id_observacoes">Observações</label>
-        <textarea id="id_observacoes" name="observacoes" placeholder="Escreva notas sobre táticas de batalha, onde foi encontrado, etc."></textarea>
+        <textarea id="id_observacoes" name="observacoes" val placeholder="Escreva notas sobre táticas de batalha, onde foi encontrado, etc.">{{ pokemon.observacoes|default:'' }}</textarea>
       </div>
     </div>
 
@@ -135,7 +139,7 @@
           <span class="hint">Marque se o Pokémon já está com você.</span>
         </div>
         <label class="switch">
-          <input type="checkbox" id="id_capturado" name="capturado" />
+          <input type="checkbox" id="id_capturado" name="capturado" {% if pokemon.capturado %} checked {% endif %} />
           <span class="switch-track"></span>
         </label>
       </div>
@@ -145,7 +149,7 @@
           <span class="hint">Destacar na página inicial.</span>
         </div>
         <label class="switch">
-          <input type="checkbox" id="id_favorito" name="favorito" />
+          <input type="checkbox" id="id_favorito" name="favorito" {% if pokemon.favorito %} checked {% endif %}/>
           <span class="switch-track"></span>
         </label>
       </div>

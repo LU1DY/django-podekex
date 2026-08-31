@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .services import buscar_dados_pokemon
 from .models import Pokemon
 # Create your views here.
@@ -53,8 +53,9 @@ def salvar_pokemon(request):
     if request.method == "POST":
         nome = request.POST.get("nome")
         id_pokemon = request.POST.get("id_pokemon")
-        tipos = request.POST.get("tipos")
-        habilidades = request.POST.get("habilidades")
+        tipos = request.POST.getlist("tipos")
+        print(tipos)
+        habilidades = request.POST.getlist("habilidades")
         altura = request.POST.get("altura", 0)
         peso = request.POST.get("peso", 0)
 
@@ -86,7 +87,7 @@ def salvar_pokemon(request):
                 capturado=capturado,
                 favorito=favorito
             )
-            return redirect('buscar_dados_pokemon')
+            return redirect('listar_pokemons')
 
     else:
         id_pokemon = request.GET.get("id_pokemon")
@@ -111,7 +112,7 @@ def salvar_pokemon(request):
                     "sprite_url": dados["sprites"]["front_default"]
                 }
 
-    return render(request, "form_add_pokemon.html", {"pokemon": pokemon})
+    return render(request, "form_pokemon.html", {"pokemon": pokemon})
 
 # R - READ
 def listar_pokemons(request):
@@ -119,9 +120,40 @@ def listar_pokemons(request):
     return render(request, "listar_pokemons.html", {'pokemons': pokemons})
     
 # U - UPDATE 
-def editar_pokemon(request):
-    return
+def editar_pokemon(request, pk):
+    pokemon = get_object_or_404(Pokemon, pk=pk)
+    print(pokemon)
+    if request.method == "POST":
+        pokemon.nome = request.POST.get("nome")
+        pokemon.id_pokemon = request.POST.get("id_pokemon")
+        pokemon.tipos = request.POST.getlist("tipos")
+        pokemon.habilidades = request.POST.getlist("habilidades")
+        pokemon.altura = request.POST.get("altura", 0)
+        pokemon.peso = request.POST.get("peso", 0)
+
+        pokemon.hp = request.POST.get("hp", 0)
+        pokemon.ataque = request.POST.get("ataque", 0)
+        pokemon.defesa = request.POST.get("defesa", 0)
+        pokemon.velocidade = request.POST.get("velocidade", 0)
+
+        pokemon.sprite_url = request.POST.get("sprite_url", "")
+        pokemon.observacoes = request.POST.get("observacoes", "")
+
+        pokemon.capturado = "capturado" in request.POST
+        pokemon.favorito = "favorito" in request.POST
+        
+        pokemon.save()
+        return redirect("listar_pokemons")
+        
+    return render(request, "form_pokemon.html", {'titulo': pokemon.nome, 'pokemon': pokemon})
 
 # D - DELETE
-def remover_pokemon(request):
-    return
+def remover_pokemon(request, pk):
+    pokemon = get_object_or_404(Pokemon, pk=pk)
+    
+    if request.method == "POST":
+        pokemon.delete()
+        return redirect("listar_pokemons")
+    
+    return render(request, "confirmar_exclusao.html", {"pokemon": pokemon})
+
