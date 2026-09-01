@@ -1,7 +1,13 @@
+{% load static %} 
+
+
+{% block estilos %}
+<link rel="stylesheet" href="{% static 'css/sidebar.css'%}">
+{% endblock %}
 <aside class="sidebar">
   <div class="sidebar-top">
     <div class="sidebar-logo">
-      <div class="ball"></div>
+      <img src="{% static '439-4392804_pokeball-pokemon-ball-svg.png' %}" alt="Pokeball">
       <div>
         <h1>Pokédex</h1>
         <span>Minha Coleção de Treinador</span>

@@ -12,28 +12,31 @@ def buscar_pokemon(request):
 
         if id_nome:
             dados = buscar_dados_pokemon(id_nome)
-            pokemon = {
-                "nome": dados['name'], 
-                "id_pokemon": dados['id'], 
-                
-                "tipos": [t["type"]["name"] for t in dados["types"]],
-                
-                "altura": dados["height"],
-                "peso": dados["weight"],
-                "habilidades": [habilidade["ability"]["name"] for habilidade in dados["abilities"]],
-                
-                "hp": dados["stats"][0]["base_stat"], 
-                "ataque": dados["stats"][1]["base_stat"], 
-                "defesa": dados["stats"][2]["base_stat"], 
-                "velocidade": dados["stats"][5]["base_stat"], 
-                "sprite_url": dados["sprites"]["front_default"]
+
+            if dados is None:
+                erro = f'Nenhum Pokémon encontrado com o nome ou número "{id_nome}".'
+            else:
+                pokemon = {
+                    "nome": dados['name'],
+                    "id_pokemon": dados['id'],
+
+                    "tipos": [t["type"]["name"] for t in dados["types"]],
+
+                    "altura": dados["height"],
+                    "peso": dados["weight"],
+                    "habilidades": [habilidade["ability"]["name"] for habilidade in dados["abilities"]],
+
+                    "hp": dados["stats"][0]["base_stat"],
+                    "ataque": dados["stats"][1]["base_stat"],
+                    "defesa": dados["stats"][2]["base_stat"],
+                    "velocidade": dados["stats"][5]["base_stat"],
+                    "sprite_url": dados["sprites"]["front_default"]
                 }
-            
+
     else:
         print("Erro ao buscar pokemon!")
 
     return render(request, "buscar_dados_pokemon.html", {"pokemon": pokemon, "erro": erro})
-
 def home(request):
     pokemons = Pokemon.objects.all()
 
@@ -117,6 +120,7 @@ def salvar_pokemon(request):
 # R - READ
 def listar_pokemons(request):
     pokemons = Pokemon.objects.all()
+    
     return render(request, "listar_pokemons.html", {'pokemons': pokemons})
     
 # U - UPDATE 

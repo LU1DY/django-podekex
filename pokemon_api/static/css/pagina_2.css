@@ -1,0 +1,120 @@
+.page .search-page h1 {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+.search-page > p {
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.search-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  max-width: 600px;
+}
+.search-box input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  font-size: 14px;
+}
+.search-box input:focus {
+  outline: none;
+  border-color: var(--red);
+}
+.erro-msg {
+  color: var(--red);
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.result-card {
+  padding: 28px;
+  display: flex;
+  gap: 28px;
+  max-width: 900px;
+}
+.result-image {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 14px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.result-image img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+}
+.result-info {
+  flex: 1;
+}
+.result-number {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: bold;
+}
+.result-info h2 {
+  font-size: 22px;
+  margin: 2px 0 10px;
+}
+.result-types {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.result-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.result-meta-item {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.result-meta-item span {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.result-meta-item strong {
+  font-size: 14px;
+}
+.result-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+  margin-bottom: 22px;
+}
+.stat-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stat-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.stat-bar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: #f1e9de;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 999px;
+}

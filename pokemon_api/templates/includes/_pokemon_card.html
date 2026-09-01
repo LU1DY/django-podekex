@@ -1,7 +1,10 @@
 {% load pokemon_extras %}
+
 <div class="card poke-card">
   <div class="poke-card-top">
-    <span class="poke-card-number">#{{ pokemon.id_pokemon|stringformat:"03d" }}</span>
+    <span class="poke-card-number"
+      >#{{ pokemon.id_pokemon|stringformat:"03d" }}</span
+    >
     {% if pokemon.favorito %}<span class="poke-card-favorite">❤️</span>{% endif %}
   </div>
 
@@ -9,30 +12,44 @@
     <img src="{{ pokemon.sprite_url }}" alt="{{ pokemon.nome }}" />
   </div>
 
-  <h3 class="poke-card-name">{{ pokemon.nome }}</h3>
-  
-  {% for tipo in pokemon.tipos %} 
-    <div class="poke-card-types">
-      <span class="type-badge">
-        <span class="dot" style="background: {{ tipo|cor_tipo }};">
-          {{ tipo }}
-        </span>
-      </span> 
-    </div>
-  {%endfor%}
+  <h3 class="poke-card-name" style="text-transform: capitalize;">{{ pokemon.nome }}</h3>
+<h2>Data {{pokemon.data_captura}}</h2>
+  {% for tipo in pokemon.tipos %}
+  <div class="poke-card-types">
+    <span class="type-badge">
+      <span class="dot" style="background: {{ tipo|cor_tipo }};"> </span>
+      <p>{{ tipo }}</p>
+    </span>
+  </div>
+  {%endfor%} {% if pokemon.observacoes %}
+  <p class="poke-card-obs">{{ pokemon.observacoes }}</p>
+  {% endif %}
 
-  {% if pokemon.observacoes %}<p class="poke-card-obs">{{ pokemon.observacoes }}</p>{% endif %}
-
-  <span class="poke-card-status {% if pokemon.capturado %}captured{% else %}not-captured{% endif %}">{% if pokemon.capturado %}✓ Capturado{% else %}Não capturado{% endif %}</span>
+  <span
+    class="poke-card-status {% if pokemon.capturado %}captured{% else %}not-captured{% endif %}"
+    >{% if pokemon.capturado %}✓ Capturado{% else %}Não capturado{% endif %}</span
+  >
 
   {% if not compacto %}
- <div class="poke-card-actions">
-  <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-secondary">✏️ Editar</a>
+  <div class="poke-card-actions">
+    <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-secondary"
+      >✏️ Editar</a
+    >
 
-  <form action="{% url 'remover_pokemon' pokemon.pk %}" method="post" style="display:contents;">
-    {% csrf_token %}
-    <button type="submit" class="btn-icon" onclick="return confirm('Deseja realmente remover o {{ pokemon.nome }} da sua coleção?')">🗑️</button>
-  </form>
-</div>
+    <form
+      action="{% url 'remover_pokemon' pokemon.pk %}"
+      method="post"
+      style="display: contents"
+    >
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="btn-icon"
+        onclick="return confirm('Deseja realmente remover o {{ pokemon.nome }} da sua coleção?')"
+      >
+        🗑️
+      </button>
+    </form>
+  </div>
   {% endif %}
 </div>

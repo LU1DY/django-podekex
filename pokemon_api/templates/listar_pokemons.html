@@ -1,40 +1,12 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block titulo %}Minha Coleção{% endblock %}
 
+
 {% block estilos %}
-  .collection-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-  .collection-header h1 { font-size: 24px; }
-  .collection-header p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
-  .collection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-
-  .poke-card { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-  .poke-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-  .poke-card-number { font-size: 12px; color: var(--text-muted); font-weight: bold; }
-  .poke-card-favorite { font-size: 16px; }
-  .poke-card-image {
-    height: 140px; display: flex; align-items: center; justify-content: center;
-    background-image: radial-gradient(var(--border) 1px, transparent 1px);
-    background-size: 14px 14px; border-radius: var(--radius-sm);
-  }
-  .poke-card-image img { max-width: 100px; max-height: 100px; object-fit: contain; }
-  .poke-card-name { font-size: 18px; }
-  .poke-card-types { display: flex; gap: 6px; flex-wrap: wrap; }
-  .poke-card-obs {
-    font-size: 12px; color: var(--text-muted); font-style: italic;
-    background: var(--bg); padding: 8px; border-left: 2px solid var(--red);
-    border-radius: 0 6px 6px 0;
-  }
-  .poke-card-status { font-size: 12px; font-weight: bold; }
-  .poke-card-status.captured { color: #155724; }
-  .poke-card-status.not-captured { color: var(--text-muted); }
-  .poke-card-actions { display: flex; gap: 8px; margin-top: auto; }
-  .poke-card-actions .btn-secondary { flex: 1; }
-
-  .empty-state { max-width: 500px; margin: 80px auto; text-align: center; padding: 40px; }
-  .empty-state h2 { margin-bottom: 10px; color: #4a4a4a; }
-  .empty-state p { color: var(--text-muted); margin-bottom: 20px; }
+  <link rel="stylesheet" href="{% static 'css/listar_pokemons.css' %}">
 {% endblock %}
+
 
 {% block conteudo %}
 <div class="collection-header">
