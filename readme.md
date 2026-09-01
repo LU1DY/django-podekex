@@ -158,13 +158,10 @@ Acesse **http://127.0.0.1:8000/** no navegador para abrir a página inicial da P
 
 ## 👨‍💻 Autores
 
-**Luidy Michael**
-📚 [Curso/Instituição a confirmar]
+**Luidy Michael da Silva**
+📚 Sistema de Informação - FEPI
+
+**Gustavo Farias Melo Silva**
+📚 Sistema de Informação - FEPI
 
 <!-- Adicione aqui os demais integrantes do grupo, no mesmo formato -->
-
----
-
-## 📌 Status do Projeto
-
-🚧 Em desenvolvimento
