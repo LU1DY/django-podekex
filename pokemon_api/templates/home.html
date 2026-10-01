@@ -1,19 +1,15 @@
-{% extends 'base.html' %} {% load static %} {% block titulo %}Início{% endblock %} {% block estilos %}
+{% extends 'base.html' %} {% load static %} {% block titulo %}Dashboard{% endblock %} {% block estilos %}
 <link rel="stylesheet" href="{% static 'css/home.css'%}" />
-{% endblock %} 
+{% endblock %}
 
 {% block conteudo %}
 <div class="card hero-card">
   <span class="hero-tag">Pokedex do Treinador</span>
-  <h2>Ola, Treinador!</h2>
-  <p>Gerencie sua colecao de Pokemon.</p>
+  <h2>Dashboard</h2>
+  <p>Visão geral da sua coleção de Pokémon.</p>
   <div class="hero-actions">
-    <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary"
-      >Buscar Pokemon</a
-    >
-    <a href="{% url 'listar_pokemons' %}" class="btn btn-secondary"
-      >Ver minha colecao</a
-    >
+    <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">Buscar Pokemon</a>
+    <a href="{% url 'listar_pokemons' %}" class="btn btn-secondary">Ver minha colecao</a>
   </div>
 </div>
 
@@ -25,6 +21,14 @@
     </div>
     <span class="stat-card-value">{{ total_colecao }}</span>
     <span class="stat-card-caption">Registros cadastrados</span>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-card-top">
+      <span>Capturados</span>
+      <div class="stat-card-icon">C</div>
+    </div>
+    <span class="stat-card-value">{{ total_capturados }}</span>
+    <span class="stat-card-caption">De {{ total_colecao }} na coleção</span>
   </div>
   <div class="card stat-card">
     <div class="stat-card-top">
@@ -42,9 +46,98 @@
     <span class="stat-card-value">{{ tipos_descobertos }}</span>
     <span class="stat-card-caption">De 18 tipos possiveis</span>
   </div>
+  <div class="card stat-card">
+    <div class="stat-card-top">
+      <span>Treinadores</span>
+      <div class="stat-card-icon">R</div>
+    </div>
+    <span class="stat-card-value">{{ total_treinadores }}</span>
+    <span class="stat-card-caption">Treinadores cadastrados</span>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-card-top">
+      <span>Habilidades</span>
+      <div class="stat-card-icon">H</div>
+    </div>
+    <span class="stat-card-value">{{ total_habilidades }}</span>
+    <span class="stat-card-caption">Catalogadas no sistema</span>
+  </div>
+</div>
+
+<div class="panels-row">
+  <div class="card panel">
+    <h3>Pokémon por região</h3>
+    {% if por_regiao %}
+    <ul class="rank-list">
+      {% for regiao in por_regiao %}
+      <li><span>{{ regiao.nome }}</span><strong>{{ regiao.total }}</strong></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty-message">Nenhum Pokémon com região ainda.</p>
+    {% endif %}
+  </div>
+
+  <div class="card panel">
+    <h3>Pokémon por treinador</h3>
+    <ul class="rank-list">
+      {% for treinador in por_treinador %}
+      <li><span>{{ treinador.nome }}</span><strong>{{ treinador.total }}</strong></li>
+      {% endfor %}
+      <li><span>Sem treinador</span><strong>{{ sem_treinador }}</strong></li>
+    </ul>
+  </div>
+
+  <div class="card panel">
+    <h3>Média dos atributos</h3>
+    {% if total_colecao %}
+    <ul class="rank-list">
+      <li><span>HP</span><strong>{{ medias.hp|floatformat:1 }}</strong></li>
+      <li><span>Ataque</span><strong>{{ medias.ataque|floatformat:1 }}</strong></li>
+      <li><span>Defesa</span><strong>{{ medias.defesa|floatformat:1 }}</strong></li>
+      <li><span>Velocidade</span><strong>{{ medias.velocidade|floatformat:1 }}</strong></li>
+    </ul>
+    {% if mais_forte %}
+    <p class="panel-note">Mais forte: <strong style="text-transform: capitalize;">{{ mais_forte.nome }}</strong> ({{ mais_forte.total_stats }} pts)</p>
+    {% endif %}
+    {% else %}
+    <p class="empty-message">Sem dados para calcular.</p>
+    {% endif %}
+  </div>
 </div>
 
 <div class="favorites-header">
+  <div>
+    <h2>Adicionados recentemente</h2>
+    <p>Os últimos Pokémon salvos na coleção.</p>
+  </div>
+  <a href="{% url 'listar_pokemons' %}">Ver todos</a>
+</div>
+
+{% if recentes %}
+<div class="card table-card">
+  <table class="recent-table">
+    <thead>
+      <tr><th>Nº</th><th>Nome</th><th>Região</th><th>Treinador</th><th>Adicionado em</th></tr>
+    </thead>
+    <tbody>
+      {% for pokemon in recentes %}
+      <tr>
+        <td>#{{ pokemon.id_pokemon|stringformat:"03d" }}</td>
+        <td style="text-transform: capitalize;">{{ pokemon.nome }}</td>
+        <td>{{ pokemon.regiao|default:"-" }}</td>
+        <td>{{ pokemon.treinador|default:"-" }}</td>
+        <td>{{ pokemon.data_captura|date:"d/m/Y" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty-message">Nenhum Pokémon salvo ainda.</p>
+{% endif %}
+
+<div class="favorites-header section-gap">
   <div>
     <h2>Pokemon favoritos</h2>
     <p>Os destaques da sua colecao.</p>
@@ -54,9 +147,11 @@
 
 {% if favoritos %}
 <div class="favorites-grid">
-  {% for pokemon in favoritos %} 
-  {% include 'includes/_pokemon_card.html' with pokemon=pokemon compacto=True %} {% endfor %}
+  {% for pokemon in favoritos %}
+  {% include 'includes/_pokemon_card.html' with pokemon=pokemon compacto=True %}
+  {% endfor %}
 </div>
 {% else %}
 <p class="empty-message">Voce ainda nao marcou nenhum Pokemon como favorito.</p>
-{% endif %} {% endblock %}
+{% endif %}
+{% endblock %}
