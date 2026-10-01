@@ -33,6 +33,18 @@
 
       <div class="form-row">
         <div class="form-field">
+          <label for="id_treinador">Treinador</label>
+          <select id="id_treinador" name="treinador">
+            <option value="">Sem treinador</option>
+            {% for treinador in treinadores %}
+              <option value="{{ treinador.pk }}" {% if pokemon.treinador_id == treinador.pk %}selected{% endif %}>{{ treinador.nome }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
           <label>Tipo</label>
           <div class="repeat-field">
             {% for tipo in pokemon.tipos %}

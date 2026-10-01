@@ -82,6 +82,26 @@ Diferente de uma Pokédex tradicional (que só exibe informações fixas de todo
 | `capturado` | `BooleanField` (padrão `False`) | Indica se o Pokémon já foi capturado |
 | `data_captura` | `DateField` (preenchido automaticamente) | Data em que o Pokémon foi adicionado à coleção |
 
+### Novos models (Semana 1)
+
+| Model | Campos principais | Relacionamento |
+|---|---|---|
+| `Regiao` | `nome` (único), `numero_inicial`, `numero_final` | 1:N com `Pokemon` (`Regiao.pokemons`) |
+| `Treinador` | `nome`, `cidade_natal`, `data_cadastro` | 1:N com `Pokemon` (`Treinador.pokemons`) |
+| `Habilidade` | `nome` (único), `descricao` | Catálogo de habilidades (será usado no N:N com `through`) |
+
+O model `Pokemon` ganhou duas `ForeignKey` opcionais: `treinador` e `regiao`. A região é definida automaticamente a partir do número da Pokédex (Kanto 1–151, Johto 152–251, e assim por diante). As 9 regiões são criadas pela própria migração `0005`.
+
+### Dashboard
+
+A tela inicial (`/`) exibe indicadores calculados direto do banco: total na coleção, capturados, favoritos, tipos descobertos, treinadores, habilidades catalogadas, Pokémon por região, Pokémon por treinador, média dos atributos, Pokémon mais forte e últimos adicionados.
+
+### Testes
+
+```bash
+python manage.py test
+```
+
 ---
 
 ## 📂 Estrutura do Projeto
@@ -161,7 +181,7 @@ Acesse **http://127.0.0.1:8000/** no navegador para abrir a página inicial da P
 **Luidy Michael da Silva**
 📚 Sistema de Informação - FEPI
 
-**Gustavo Farias Melo Silva**
+**Gustavo Faria Melo Silva**
 📚 Sistema de Informação - FEPI
 
 <!-- Adicione aqui os demais integrantes do grupo, no mesmo formato -->

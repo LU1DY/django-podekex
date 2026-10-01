@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Avg, Count, F
 from .services import buscar_dados_pokemon
-from .models import Pokemon
+from .models import Pokemon, Treinador, Regiao, Habilidade
 # Create your views here.
 
 def buscar_pokemon(request):
@@ -39,13 +40,48 @@ def buscar_pokemon(request):
     return render(request, "buscar_dados_pokemon.html", {"pokemon": pokemon, "erro": erro})
 def home(request):
     pokemons = Pokemon.objects.all()
-
     favoritos = pokemons.filter(favorito=True)
+
+    tipos = set()
+    for lista in pokemons.values_list('tipos', flat=True):
+        tipos.update(lista)
+
+    medias = pokemons.aggregate(
+        hp=Avg('hp'),
+        ataque=Avg('ataque'),
+        defesa=Avg('defesa'),
+        velocidade=Avg('velocidade'),
+    )
+
+    por_regiao = (
+        Regiao.objects.annotate(total=Count('pokemons'))
+        .filter(total__gt=0)
+        .order_by('-total', 'numero_inicial')
+    )
+    por_treinador = (
+        Treinador.objects.annotate(total=Count('pokemons'))
+        .order_by('-total', 'nome')
+    )
+    mais_forte = (
+        pokemons.annotate(total_stats=F('hp') + F('ataque') + F('defesa') + F('velocidade'))
+        .order_by('-total_stats')
+        .first()
+    )
 
     contexto = {
         'total_colecao': pokemons.count(),
+        'total_capturados': pokemons.filter(capturado=True).count(),
         'total_favoritos': favoritos.count(),
-        'tipos_descobertos': pokemons.values_list('tipos', flat=True).distinct().count(),
+        'tipos_descobertos': len(tipos),
+        'total_treinadores': Treinador.objects.count(),
+        'total_habilidades': Habilidade.objects.count(),
+        'total_regioes': por_regiao.count(),
+        'medias': medias,
+        'por_regiao': por_regiao,
+        'por_treinador': por_treinador,
+        'sem_treinador': pokemons.filter(treinador__isnull=True).count(),
+        'mais_forte': mais_forte,
+        'recentes': pokemons.order_by('-data_captura', '-id')[:5],
         'favoritos': favoritos[:3],
     }
     return render(request, 'home.html', contexto)
@@ -72,6 +108,7 @@ def salvar_pokemon(request):
 
         capturado = "capturado" in request.POST
         favorito = "favorito" in request.POST
+        treinador_id = request.POST.get("treinador") or None
 
         if nome and id_pokemon:
             Pokemon.objects.create(
@@ -88,7 +125,8 @@ def salvar_pokemon(request):
                 sprite_url=sprite_url,
                 observacoes=observacoes,
                 capturado=capturado,
-                favorito=favorito
+                favorito=favorito,
+                treinador_id=treinador_id
             )
             return redirect('listar_pokemons')
 
@@ -115,7 +153,7 @@ def salvar_pokemon(request):
                     "sprite_url": dados["sprites"]["front_default"]
                 }
 
-    return render(request, "form_pokemon.html", {"pokemon": pokemon})
+    return render(request, "form_pokemon.html", {"pokemon": pokemon, "treinadores": Treinador.objects.all()})
 
 # R - READ
 def listar_pokemons(request):
@@ -145,11 +183,12 @@ def editar_pokemon(request, pk):
 
         pokemon.capturado = "capturado" in request.POST
         pokemon.favorito = "favorito" in request.POST
-        
+        pokemon.treinador_id = request.POST.get("treinador") or None
+
         pokemon.save()
         return redirect("listar_pokemons")
         
-    return render(request, "form_pokemon.html", {'titulo': pokemon.nome, 'pokemon': pokemon})
+    return render(request, "form_pokemon.html", {'titulo': pokemon.nome, 'pokemon': pokemon, 'treinadores': Treinador.objects.all()})
 
 # D - DELETE
 def remover_pokemon(request, pk):
