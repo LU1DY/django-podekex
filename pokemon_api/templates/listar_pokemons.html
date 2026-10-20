@@ -2,32 +2,71 @@
 {% load static %}
 {% block titulo %}Minha Coleção{% endblock %}
 
-
 {% block estilos %}
-  <link rel="stylesheet" href="{% static 'css/listar_pokemons.css' %}">
+<link rel="stylesheet" href="{% static 'css/listar_pokemons.css' %}">
 {% endblock %}
 
-
 {% block conteudo %}
-<div class="collection-header">
-  <div>
-    <h1>Minha Coleção</h1>
-    <p>Você possui {{ pokemons|length }} pokemon(s) salvo(s)</p>
-  </div>
-  <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">+ Buscar Novo</a>
-</div>
+<section class="collection-page">
+  <header class="page-header collection-header">
+    <div>
+      <h1>Minha Coleção</h1>
+      <p><span id="collectionCount">{{ pokemons|length }}</span> de {{ pokemons|length }} Pokémon exibidos</p>
+    </div>
+    <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">+ Adicionar Pokémon</a>
+  </header>
 
-{% if pokemons %}
-  <div class="collection-grid">
-    {% for pokemon in pokemons %}
-      {% include 'includes/_pokemon_card.html' with pokemon=pokemon %}
-    {% endfor %}
-  </div>
-{% else %}
-  <div class="card empty-state">
-    <h2>Nenhum Pokémon por aqui...</h2>
-    <p>Sua coleção está vazia. Comece pesquisando e adicionando seus monstrinhos favoritos!</p>
-    <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">🔍 Buscar Pokémon</a>
-  </div>
-{% endif %}
+  {% if pokemons %}
+    <div class="card filter-bar" aria-label="Filtros da coleção">
+      <label class="search-control">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        <input id="collectionSearch" type="search" placeholder="Pesquisar na coleção..." autocomplete="off">
+      </label>
+
+      <select id="typeFilter" class="filter-select" aria-label="Filtrar por tipo">
+        <option value="">Todos os tipos</option>
+        {% for tipo in tipos_disponiveis %}<option value="{{ tipo|lower }}">{{ tipo|title }}</option>{% endfor %}
+      </select>
+
+      {% if treinadores %}
+      <select id="trainerFilter" class="filter-select" aria-label="Filtrar por treinador">
+        <option value="">Todos os treinadores</option>
+        {% for treinador in treinadores %}<option value="{{ treinador.nome|lower }}">{{ treinador.nome }}</option>{% endfor %}
+      </select>
+      {% endif %}
+
+      {% if cidades %}
+      <select id="cityFilter" class="filter-select" aria-label="Filtrar por cidade">
+        <option value="">Todas as cidades</option>
+        {% for cidade in cidades %}<option value="{{ cidade|lower }}">{{ cidade }}</option>{% endfor %}
+      </select>
+      {% endif %}
+
+      <button id="favoritesFilter" class="favorite-filter" type="button" aria-pressed="false">♡ Favoritos</button>
+    </div>
+
+    <div class="collection-grid" id="collectionGrid">
+      {% for pokemon in pokemons %}
+        {% include 'includes/_pokemon_card.html' with pokemon=pokemon %}
+      {% endfor %}
+    </div>
+
+    <div class="card empty-state filtered-empty" id="filteredEmpty" hidden>
+      <div class="empty-icon">⌕</div>
+      <h2>Nenhum resultado</h2>
+      <p>Ajuste os filtros para encontrar outros Pokémon da sua coleção.</p>
+    </div>
+  {% else %}
+    <div class="card empty-state">
+      <div class="empty-icon">◓</div>
+      <h2>Nenhum Pokémon por aqui</h2>
+      <p>Sua coleção está vazia. Busque um Pokémon na PokéAPI e adicione-o à coleção.</p>
+      <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">Buscar Pokémon</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% if pokemons %}<script src="{% static 'js/collection.js' %}"></script>{% endif %}
 {% endblock %}

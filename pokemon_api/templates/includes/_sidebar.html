@@ -1,43 +1,37 @@
-{% load static %} 
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
 
-
-{% block estilos %}
-<link rel="stylesheet" href="{% static 'css/sidebar.css'%}">
-{% endblock %}
 <aside class="sidebar">
   <div class="sidebar-top">
-    <div class="sidebar-logo">
-      <img src="{% static '439-4392804_pokeball-pokemon-ball-svg.png' %}" alt="Pokeball">
+    <a class="sidebar-logo" href="{% url 'home' %}">
+      <span class="brand-ball" aria-hidden="true"></span>
       <div>
         <h1>Pokédex</h1>
-        <span>Minha Coleção de Treinador</span>
+        <span>Minha coleção de treinador</span>
       </div>
-    </div>
+    </a>
 
-    <nav class="sidebar-nav">
-      <a
-        href="{% url 'home' %}"
-        class="sidebar-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}"
-        >🏠 Dashboard</a
-      >
-      <a
-        href="{% url 'buscar_dados_pokemon' %}"
-        class="sidebar-link{% if request.resolver_match.url_name == 'buscar_dados_pokemon' %} active{% endif %}"
-        >🔍 Buscar Pokémon</a
-      >
-      <a
-        href="{% url 'listar_pokemons' %}"
-        class="sidebar-link{% if request.resolver_match.url_name == 'listar_pokemons' %} active{% endif %}"
-        >📖 Minha Coleção</a
-      >
+    <nav class="sidebar-nav" aria-label="Navegação principal">
+      <a href="{% url 'home' %}" class="sidebar-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/></svg>
+        <span>Início</span>
+      </a>
+      <a href="{% url 'buscar_dados_pokemon' %}" class="sidebar-link{% if request.resolver_match.url_name == 'buscar_dados_pokemon' %} active{% endif %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        <span>Buscar Pokémon</span>
+      </a>
+      <a href="{% url 'listar_pokemons' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_pokemons' or request.resolver_match.url_name == 'salvar_pokemon' or request.resolver_match.url_name == 'editar_pokemon' %} active{% endif %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c2.8-.9 5.4-.5 8 1.1v13c-2.6-1.6-5.2-2-8-1.1z"/><path d="M20 5.5c-2.8-.9-5.4-.5-8 1.1v13c2.6-1.6 5.2-2 8-1.1z"/></svg>
+        <span>Minha Coleção</span>
+      </a>
     </nav>
   </div>
 
   <div class="sidebar-trainer">
     <div class="avatar">T</div>
-    <div>
-      <div class="name">Treinador</div>
-      <div class="detail">Kanto · Nível 34</div>
+    <div class="trainer-copy">
+      <div class="name">Treinadores</div>
+      <div class="detail">{{ sidebar_total_treinadores|default_if_none:0 }} treinador{{ sidebar_total_treinadores|pluralize:"es" }}{% if sidebar_total_cidades %} · {{ sidebar_total_cidades }} cidade{{ sidebar_total_cidades|pluralize }}{% endif %}</div>
     </div>
   </div>
 </aside>

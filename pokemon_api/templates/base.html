@@ -3,16 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d80d2f" />
     <title>{% block titulo %}Pokédex{% endblock %}</title>
-
     <link rel="stylesheet" href="{% static 'css/base.css' %}" />
-    {% block estilos%}
-    {% endblock %}
+    {% block estilos %}{% endblock %}
   </head>
   <body>
     <div class="app-layout">
       {% include 'includes/_sidebar.html' %}
       <main class="page">{% block conteudo %}{% endblock %}</main>
     </div>
+    {% block scripts %}{% endblock %}
   </body>
 </html>

@@ -1,143 +1,150 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block titulo %}Cadastrar Pokémon{% endblock %}
-
-{% block estilos %}
- <link rel="stylesheet" href="{% static 'css/form_pokemon.css'%}">
-{% endblock %}
+{% block titulo %}{% if titulo %}Editar{% else %}Adicionar{% endif %} Pokémon · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/form_pokemon.css' %}">{% endblock %}
 
 {% block conteudo %}
-<div class="edit-page">
-  <h1>Cadastrar Pokémon</h1>
-  <p>Insira as informações para registrar o monstrinho na sua base de dados.</p>
+<section class="edit-page">
+  <header class="page-header form-page-header">
+    <h1>{% if titulo %}Editar Pokémon{% else %}Adicionar Pokémon{% endif %}</h1>
+    <p>{% if titulo %}Atualize os dados de {{ titulo }} na sua coleção.{% else %}Preencha os dados para registrar um novo Pokémon na sua coleção.{% endif %}</p>
+  </header>
 
-  <form method="POST">
+  <form method="POST" class="pokemon-form">
     {% csrf_token %}
 
-    {% if titulo %}
-    <h2>Editando {{titulo}}</h2>
-    {%endif%}
-
     <div class="card form-section">
-      <div class="form-section-title">Dados principais</div>
+      <div class="form-section-title">Identificação</div>
       <div class="form-row">
         <div class="form-field">
           <label for="id_nome">Nome</label>
-          <input type="text" id="id_nome" name="nome" placeholder="Ex: Bulbasaur" required maxlength="100" value="{{ pokemon.nome|default:'' }}" />
+          <input type="text" id="id_nome" name="nome" placeholder="Ex: Pikachu" required maxlength="100" value="{{ pokemon.nome|default:'' }}" />
         </div>
         <div class="form-field">
           <label for="id_pokemon">Número da Pokédex</label>
-          <input type="number" id="id_pokemon" name="id_pokemon" placeholder="Ex: 1" required min="1" value="{{ pokemon.id_pokemon }}" />
+          <input type="number" id="id_pokemon" name="id_pokemon" placeholder="Ex: 25" required min="1" value="{{ pokemon.id_pokemon|default:'' }}" />
+          <span class="field-hint">A região é definida automaticamente pelo número da Pokédex.</span>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-field">
-          <label for="id_treinador">Treinador</label>
+          <label>Tipo(s)</label>
+          <div class="repeat-field compact-repeat">
+            {% if pokemon.tipos %}
+              {% for tipo in pokemon.tipos %}<input type="text" name="tipos" placeholder="Ex: electric" maxlength="50" value="{{ tipo }}" />{% endfor %}
+            {% else %}
+              <input type="text" name="tipos" placeholder="Ex: electric" maxlength="50" />
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Habilidade(s)</label>
+          <div class="repeat-field compact-repeat">
+            {% if pokemon.habilidades %}
+              {% for habilidade in pokemon.habilidades %}<input type="text" name="habilidades" placeholder="Ex: static" maxlength="150" value="{{ habilidade }}" />{% endfor %}
+            {% else %}
+              <input type="text" name="habilidades" placeholder="Ex: static" maxlength="150" />
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Treinador e cidade</div>
+      <div class="trainer-fields">
+        <div class="form-field">
+          <label for="id_treinador">Treinador responsável</label>
           <select id="id_treinador" name="treinador">
-            <option value="">Sem treinador</option>
+            <option value="" data-city="">Sem treinador</option>
             {% for treinador in treinadores %}
-              <option value="{{ treinador.pk }}" {% if pokemon.treinador_id == treinador.pk %}selected{% endif %}>{{ treinador.nome }}</option>
+              <option value="{{ treinador.pk }}" data-city="{{ treinador.cidade_natal }}" {% if pokemon.treinador_id == treinador.pk %}selected{% endif %}>
+                {{ treinador.nome }}{% if treinador.cidade_natal %} — {{ treinador.cidade_natal }}{% endif %}
+              </option>
             {% endfor %}
           </select>
+          <span class="field-hint">O cadastro do treinador define também a cidade natal exibida no card.</span>
+        </div>
+        <div class="city-preview">
+          <span>Cidade natal</span>
+          <strong id="trainerCity">{% if pokemon.treinador and pokemon.treinador.cidade_natal %}{{ pokemon.treinador.cidade_natal }}{% else %}Não informada{% endif %}</strong>
+          <small>Vinculada ao treinador selecionado.</small>
         </div>
       </div>
+    </div>
 
-      <div class="form-row">
-        <div class="form-field">
-          <label>Tipo</label>
-          <div class="repeat-field">
-            {% for tipo in pokemon.tipos %}
-              <input type="text" name="tipos" placeholder="Ex: Grass / Poison" required maxlength="50" value="{{ tipo }}" />
-            {% endfor %}
-          </div>
-        </div>
-        <div class="form-field">
-          <label>Habilidade</label>
-          <div class="repeat-field">
-            {% for habilidade in pokemon.habilidades %}
-              <input type="text" name="habilidades" placeholder="Ex: Overgrow" maxlength="150" value="{{ habilidade }}" />
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
+    <div class="card form-section">
+      <div class="form-section-title">Atributos</div>
       <div class="form-row">
         <div class="form-field">
           <label for="id_altura">Altura</label>
-          <input type="text" id="id_altura" name="altura" placeholder="Ex: 0.7 m" maxlength="20" value="{{ pokemon.altura }}" />
+          <input type="text" id="id_altura" name="altura" placeholder="Ex: 0.4 m" maxlength="20" value="{{ pokemon.altura|default:'' }}" />
         </div>
         <div class="form-field">
           <label for="id_peso">Peso</label>
-          <input type="text" id="id_peso" name="peso" placeholder="Ex: 6.9 kg" maxlength="20" value="{{ pokemon.peso }}" />
+          <input type="text" id="id_peso" name="peso" placeholder="Ex: 6.0 kg" maxlength="20" value="{{ pokemon.peso|default:'' }}" />
         </div>
       </div>
-    </div>
 
-    <div class="card form-section">
-      <div class="form-section-title">Atributos base (stats)</div>
-      <div class="form-row cols-4">
-        <div class="form-field">
-          <label for="id_hp">HP</label>
-          <input type="number" id="id_hp" name="hp" min="0" value="{{ pokemon.hp }}" />
-        </div>
-        <div class="form-field">
-          <label for="id_ataque">Ataque</label>
-          <input type="number" id="id_ataque" name="ataque" min="0" value="{{ pokemon.ataque }}" />
-        </div>
-        <div class="form-field">
-          <label for="id_defesa">Defesa</label>
-          <input type="number" id="id_defesa" name="defesa" min="0" value="{{ pokemon.defesa }}" />
-        </div>
-        <div class="form-field">
-          <label for="id_velocidade">Velocidade</label>
-          <input type="number" id="id_velocidade" name="velocidade" min="0" value="{{ pokemon.velocidade }}" />
-        </div>
+      <div class="form-row cols-4 stats-fields">
+        <div class="form-field"><label for="id_hp">HP</label><input type="number" id="id_hp" name="hp" min="0" value="{{ pokemon.hp|default:0 }}" /></div>
+        <div class="form-field"><label for="id_ataque">Ataque</label><input type="number" id="id_ataque" name="ataque" min="0" value="{{ pokemon.ataque|default:0 }}" /></div>
+        <div class="form-field"><label for="id_defesa">Defesa</label><input type="number" id="id_defesa" name="defesa" min="0" value="{{ pokemon.defesa|default:0 }}" /></div>
+        <div class="form-field"><label for="id_velocidade">Velocidade</label><input type="number" id="id_velocidade" name="velocidade" min="0" value="{{ pokemon.velocidade|default:0 }}" /></div>
       </div>
-    </div>
 
-    <div class="card form-section">
-      <div class="form-section-title">Mídia e notas</div>
-      <div class="form-field" style="margin-bottom: 16px;">
-        <label for="id_sprite_url">URL da imagem (sprite)</label>
-        <input type="url" name="sprite_url" id="id_sprite_url" value="{{ pokemon.sprite_url }}" />
-        {% if pokemon.sprite_url %}
-          <img class="preview-img" src="{{ pokemon.sprite_url }}" alt="Pré-visualização" />
-        {% endif %}
-      </div>
-      <div class="form-field">
+      <div class="form-field notes-field">
         <label for="id_observacoes">Observações</label>
-        <textarea id="id_observacoes" name="observacoes" val placeholder="Escreva notas sobre táticas de batalha, onde foi encontrado, etc.">{{ pokemon.observacoes|default:'' }}</textarea>
+        <textarea id="id_observacoes" name="observacoes" placeholder="Onde foi capturado, estratégia de treino, observações sobre o treinador...">{{ pokemon.observacoes|default:'' }}</textarea>
       </div>
     </div>
 
-    <div class="card form-section">
-      <div class="toggle-row">
-        <div>
-          <strong>Capturado</strong>
-          <span class="hint">Marque se o Pokémon já está com você.</span>
+    <div class="card form-section media-section">
+      <div class="form-section-title">Imagem</div>
+      <div class="media-row">
+        <div class="form-field media-input">
+          <label for="id_sprite_url">URL da imagem (sprite)</label>
+          <input type="url" name="sprite_url" id="id_sprite_url" placeholder="https://..." value="{{ pokemon.sprite_url|default:'' }}" />
+          <span class="field-hint">Ao adicionar pela busca, a imagem da PokéAPI já vem preenchida.</span>
         </div>
-        <label class="switch">
-          <input type="checkbox" id="id_capturado" name="capturado" {% if pokemon.capturado %} checked {% endif %} />
-          <span class="switch-track"></span>
-        </label>
+        <div class="sprite-preview dotted-surface">
+          {% if pokemon.sprite_url %}<img src="{{ pokemon.sprite_url }}" alt="Pré-visualização de {{ pokemon.nome }}" />{% else %}<span>Sem imagem</span>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-section toggle-section">
+      <div class="toggle-row">
+        <div><strong>Capturado</strong><span class="hint">Indica que o Pokémon já faz parte da equipe/coleção.</span></div>
+        <label class="switch"><input type="checkbox" id="id_capturado" name="capturado" {% if pokemon.capturado %}checked{% endif %}><span class="switch-track"></span></label>
       </div>
       <div class="toggle-row">
-        <div>
-          <strong>Favorito</strong>
-          <span class="hint">Destacar na página inicial.</span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="id_favorito" name="favorito" {% if pokemon.favorito %} checked {% endif %}/>
-          <span class="switch-track"></span>
-        </label>
+        <div><strong>Favorito</strong><span class="hint">Destaca o Pokémon na página inicial.</span></div>
+        <label class="switch"><input type="checkbox" id="id_favorito" name="favorito" {% if pokemon.favorito %}checked{% endif %}><span class="switch-track"></span></label>
       </div>
     </div>
 
     <div class="form-actions">
-      <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-secondary">✕ Cancelar</a>
-      <button type="submit" class="btn btn-primary">💾 Salvar Pokémon</button>
+      <a href="{% url 'listar_pokemons' %}" class="btn btn-secondary">Cancelar</a>
+      <button type="submit" class="btn btn-primary">Salvar Pokémon</button>
     </div>
   </form>
-</div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(() => {
+  const select = document.querySelector('#id_treinador');
+  const city = document.querySelector('#trainerCity');
+  if (!select || !city) return;
+  const updateCity = () => {
+    const option = select.options[select.selectedIndex];
+    city.textContent = option?.dataset.city || 'Não informada';
+  };
+  select.addEventListener('change', updateCity);
+  updateCity();
+})();
+</script>
 {% endblock %}
