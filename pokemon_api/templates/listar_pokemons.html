@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}Minha Coleção{% endblock %}
+
+
+{% block estilos %}
+  <link rel="stylesheet" href="{% static 'css/listar_pokemons.css' %}">
+{% endblock %}
+
+
+{% block conteudo %}
+<div class="collection-header">
+  <div>
+    <h1>Minha Coleção</h1>
+    <p>Você possui {{ pokemons|length }} pokemon(s) salvo(s)</p>
+  </div>
+  <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">+ Buscar Novo</a>
+</div>
+
+{% if pokemons %}
+  <div class="collection-grid">
+    {% for pokemon in pokemons %}
+      {% include 'includes/_pokemon_card.html' with pokemon=pokemon %}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card empty-state">
+    <h2>Nenhum Pokémon por aqui...</h2>
+    <p>Sua coleção está vazia. Comece pesquisando e adicionando seus monstrinhos favoritos!</p>
+    <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">🔍 Buscar Pokémon</a>
+  </div>
+{% endif %}
+{% endblock %}

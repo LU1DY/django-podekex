@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}{% if titulo %}Editar Pokémon{% else %}Cadastrar Pokémon{% endif %}{% endblock %}
+
+{% block estilos %}
+ <link rel="stylesheet" href="{% static 'css/form_pokemon.css'%}">
+{% endblock %}
+
+{% block conteudo %}
+<div class="edit-page">
+  <h1>{% if titulo %}Editar Pokémon{% else %}Cadastrar Pokémon{% endif %}</h1>
+  <p>Insira as informações para registrar o monstrinho na sua base de dados.</p>
+
+  <form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if titulo %}
+    <h2>Editando {{ titulo }}</h2>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    <div class="message error">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="card form-section">
+      <div class="form-section-title">Dados principais</div>
+      <div class="form-row">
+        {% include 'includes/_campo.html' with campo=form.nome %}
+        {% include 'includes/_campo.html' with campo=form.id_pokemon %}
+      </div>
+
+      <div class="form-row">
+        {% include 'includes/_campo.html' with campo=form.treinador %}
+      </div>
+
+      <div class="form-row">
+        {% include 'includes/_campo.html' with campo=form.tipos %}
+        {% include 'includes/_campo.html' with campo=form.habilidades %}
+      </div>
+
+      <div class="form-row">
+        {% include 'includes/_campo.html' with campo=form.altura %}
+        {% include 'includes/_campo.html' with campo=form.peso %}
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Atributos base (stats)</div>
+      <div class="form-row cols-4">
+        {% include 'includes/_campo.html' with campo=form.hp %}
+        {% include 'includes/_campo.html' with campo=form.ataque %}
+        {% include 'includes/_campo.html' with campo=form.defesa %}
+        {% include 'includes/_campo.html' with campo=form.velocidade %}
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Mídia e notas</div>
+      <div style="margin-bottom: 16px;">
+        {% include 'includes/_campo.html' with campo=form.sprite_url %}
+        {% if form.sprite_url.value %}
+          <img class="preview-img" src="{{ form.sprite_url.value }}" alt="Pré-visualização" />
+        {% endif %}
+      </div>
+      {% include 'includes/_campo.html' with campo=form.observacoes %}
+    </div>
+
+    <div class="card form-section">
+      <div class="toggle-row">
+        <div>
+          <strong>Capturado</strong>
+          <span class="hint">Marque se o Pokémon já está com você.</span>
+        </div>
+        <label class="switch">
+          {{ form.capturado }}
+          <span class="switch-track"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <strong>Favorito</strong>
+          <span class="hint">Destacar na página inicial.</span>
+        </div>
+        <label class="switch">
+          {{ form.favorito }}
+          <span class="switch-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'listar_pokemons' %}" class="btn btn-secondary">✕ Cancelar</a>
+      <button type="submit" class="btn btn-primary">💾 Salvar Pokémon</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

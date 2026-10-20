@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block titulo %}Remover Pokémon{% endblock %}
+
+{% block conteudo %}
+<div class="card confirm-card">
+  <h1>Remover Pokémon</h1>
+  <p>
+    Deseja realmente remover
+    <strong style="text-transform: capitalize;">{{ pokemon.nome }}</strong>
+    da coleção? Esta ação não pode ser desfeita.
+  </p>
+  <form method="POST" class="confirm-actions">
+    {% csrf_token %}
+    <a href="{% url 'listar_pokemons' %}" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-primary">Sim, remover</button>
+  </form>
+</div>
+{% endblock %}
