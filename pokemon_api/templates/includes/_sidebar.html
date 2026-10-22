@@ -20,10 +20,21 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
         <span>Buscar Pokémon</span>
       </a>
+<<<<<<< HEAD
       <a href="{% url 'listar_pokemons' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_pokemons' or request.resolver_match.url_name == 'salvar_pokemon' or request.resolver_match.url_name == 'editar_pokemon' %} active{% endif %}">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c2.8-.9 5.4-.5 8 1.1v13c-2.6-1.6-5.2-2-8-1.1z"/><path d="M20 5.5c-2.8-.9-5.4-.5-8 1.1v13c2.6-1.6 5.2-2 8-1.1z"/></svg>
         <span>Minha Coleção</span>
       </a>
+=======
+      <a href="{% url 'listar_pokemons' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_pokemons' or request.resolver_match.url_name == 'salvar_pokemon' or request.resolver_match.url_name == 'editar_pokemon' or request.resolver_match.url_name == 'detalhes_pokemon' %} active{% endif %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c2.8-.9 5.4-.5 8 1.1v13c-2.6-1.6-5.2-2-8-1.1z"/><path d="M20 5.5c-2.8-.9-5.4-.5-8 1.1v13c2.6-1.6 5.2-2 8-1.1z"/></svg>
+        <span>Minha Coleção</span>
+      </a>
+      <a href="{% url 'listar_habilidades' %}" class="sidebar-link{% if 'habilidade' in request.resolver_match.url_name %} active{% endif %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></svg>
+        <span>Habilidades</span>
+      </a>
+>>>>>>> 1eed28a (feat(semana 3): adiciona crud 2 de treinadores e relacionamentos no banco de dados)
     </nav>
   </div>
 

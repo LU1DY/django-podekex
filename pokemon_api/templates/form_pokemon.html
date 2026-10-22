@@ -38,6 +38,7 @@
             {% endif %}
           </div>
         </div>
+<<<<<<< HEAD
         <div class="form-field">
           <label>Habilidade(s)</label>
           <div class="repeat-field compact-repeat">
@@ -48,6 +49,48 @@
             {% endif %}
           </div>
         </div>
+=======
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Habilidades</div>
+      <div class="form-field">
+        <div class="ability-rows" id="habilidadeRows">
+          {% for habilidade in habilidades_form %}
+          <div class="ability-row" data-ability-row>
+            <input type="text" name="habilidade_nome" list="listaHabilidades" placeholder="Ex: static" maxlength="100" value="{{ habilidade.nome }}" />
+            <select name="habilidade_oculta" aria-label="Tipo da habilidade">
+              <option value="0">Normal</option>
+              <option value="1"{% if habilidade.oculta %} selected{% endif %}>Oculta</option>
+            </select>
+            <button type="button" class="btn-icon danger" data-remove-ability aria-label="Remover habilidade">×</button>
+          </div>
+          {% empty %}
+          <div class="ability-row" data-ability-row>
+            <input type="text" name="habilidade_nome" list="listaHabilidades" placeholder="Ex: static" maxlength="100" />
+            <select name="habilidade_oculta" aria-label="Tipo da habilidade">
+              <option value="0">Normal</option>
+              <option value="1">Oculta</option>
+            </select>
+            <button type="button" class="btn-icon danger" data-remove-ability aria-label="Remover habilidade">×</button>
+          </div>
+          {% endfor %}
+        </div>
+        <button type="button" class="btn btn-soft add-ability" id="addHabilidade">+ Adicionar habilidade</button>
+        <span class="field-hint">Escolha uma habilidade do catálogo ou digite uma nova: ela é criada automaticamente. A ordem das linhas define o slot.</span>
+        <datalist id="listaHabilidades">{% for nome in catalogo_habilidades %}<option value="{{ nome }}"></option>{% endfor %}</datalist>
+        <template id="habilidadeTemplate">
+          <div class="ability-row" data-ability-row>
+            <input type="text" name="habilidade_nome" list="listaHabilidades" placeholder="Ex: static" maxlength="100" />
+            <select name="habilidade_oculta" aria-label="Tipo da habilidade">
+              <option value="0">Normal</option>
+              <option value="1">Oculta</option>
+            </select>
+            <button type="button" class="btn-icon danger" data-remove-ability aria-label="Remover habilidade">×</button>
+          </div>
+        </template>
+>>>>>>> 1eed28a (feat(semana 3): adiciona crud 2 de treinadores e relacionamentos no banco de dados)
       </div>
     </div>
 
@@ -75,6 +118,45 @@
     </div>
 
     <div class="card form-section">
+<<<<<<< HEAD
+=======
+      <div class="form-section-title">Ficha de captura</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="{{ captura_form.apelido.id_for_label }}">Apelido</label>
+          {{ captura_form.apelido }}
+          {% for erro in captura_form.apelido.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        </div>
+        <div class="form-field">
+          <label for="{{ captura_form.nivel.id_for_label }}">Nível</label>
+          {{ captura_form.nivel }}
+          {% for erro in captura_form.nivel.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="{{ captura_form.pokebola.id_for_label }}">Pokébola usada</label>
+          {{ captura_form.pokebola }}
+          {% for erro in captura_form.pokebola.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        </div>
+        <div class="form-field">
+          <label for="{{ captura_form.data_encontro.id_for_label }}">Data do encontro</label>
+          {{ captura_form.data_encontro }}
+          {% for erro in captura_form.data_encontro.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="{{ captura_form.local.id_for_label }}">Local da captura</label>
+          {{ captura_form.local }}
+          {% for erro in captura_form.local.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+          <span class="field-hint">Opcional. Com todos os campos vazios, nenhuma ficha é criada (e a ficha existente é removida).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-section">
+>>>>>>> 1eed28a (feat(semana 3): adiciona crud 2 de treinadores e relacionamentos no banco de dados)
       <div class="form-section-title">Atributos</div>
       <div class="form-row">
         <div class="form-field">
@@ -146,5 +228,24 @@
   select.addEventListener('change', updateCity);
   updateCity();
 })();
+<<<<<<< HEAD
+=======
+
+(() => {
+  const rows = document.querySelector('#habilidadeRows');
+  const add = document.querySelector('#addHabilidade');
+  const template = document.querySelector('#habilidadeTemplate');
+  if (!rows || !add || !template) return;
+
+  add.addEventListener('click', () => {
+    rows.appendChild(template.content.cloneNode(true));
+    rows.lastElementChild.querySelector('input')?.focus();
+  });
+  rows.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-remove-ability]');
+    if (button) button.closest('[data-ability-row]').remove();
+  });
+})();
+>>>>>>> 1eed28a (feat(semana 3): adiciona crud 2 de treinadores e relacionamentos no banco de dados)
 </script>
 {% endblock %}

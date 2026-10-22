@@ -28,7 +28,11 @@
 
   <div class="poke-card-body">
     <div class="poke-card-heading">
+<<<<<<< HEAD
       <h3 class="poke-card-name">{{ pokemon.nome }}</h3>
+=======
+      <h3 class="poke-card-name"><a href="{% url 'detalhes_pokemon' pokemon.pk %}">{{ pokemon.nome }}</a></h3>
+>>>>>>> 1eed28a (feat(semana 3): adiciona crud 2 de treinadores e relacionamentos no banco de dados)
       {% if pokemon.regiao %}<span class="region-chip">{{ pokemon.regiao.nome }}</span>{% endif %}
     </div>
 
@@ -60,7 +64,12 @@
 
     {% if not compacto %}
       <div class="poke-card-actions">
+<<<<<<< HEAD
         <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-soft card-main-action">Editar dados</a>
+=======
+        <a href="{% url 'detalhes_pokemon' pokemon.pk %}" class="btn btn-soft card-main-action">Ver detalhes</a>
+        <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-secondary">Editar</a>
+>>>>>>> 1eed28a (feat(semana 3): adiciona crud 2 de treinadores e relacionamentos no banco de dados)
         <form action="{% url 'remover_pokemon' pokemon.pk %}" method="post">
           {% csrf_token %}
           <button type="submit" class="btn-icon danger" aria-label="Excluir {{ pokemon.nome }}" onclick="return confirm('Deseja realmente remover o {{ pokemon.nome }} da sua coleção?')">×</button>

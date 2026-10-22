@@ -52,7 +52,11 @@
       <div class="result-meta">
         <div class="result-meta-item"><span>Altura</span><strong>{{ pokemon.altura }}</strong></div>
         <div class="result-meta-item"><span>Peso</span><strong>{{ pokemon.peso }}</strong></div>
+<<<<<<< HEAD
         <div class="result-meta-item"><span>Habilidades</span><strong>{{ pokemon.habilidades|join:" / "|title }}</strong></div>
+=======
+        <div class="result-meta-item"><span>Habilidades</span><strong>{% for hab in pokemon.habilidades %}{{ hab.nome|nome_exibicao }}{% if hab.oculta %} (oculta){% endif %}{% if not forloop.last %} / {% endif %}{% endfor %}</strong></div>
+>>>>>>> 1eed28a (feat(semana 3): adiciona crud 2 de treinadores e relacionamentos no banco de dados)
       </div>
 
       <div class="result-stats">

@@ -16,3 +16,9 @@ def cor_tipo(tipo):
     if not tipo:
         return '#a8a878'
     return CORES_POR_TIPO.get(tipo.lower(), '#a8a878')
+
+
+@register.filter
+def nome_exibicao(valor):
+    """'lightning-rod' -> 'Lightning Rod' (nomes vindos da PokeAPI usam hífen)."""
+    return str(valor or '').replace('-', ' ').title()

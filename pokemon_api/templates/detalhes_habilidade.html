@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pokemon_extras %}
+{% block titulo %}{{ habilidade.nome|nome_exibicao }} · Habilidade · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/habilidades.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="ability-page">
+  <header class="page-header toolbar-header">
+    <div>
+      <a href="{% url 'listar_habilidades' %}" class="back-link">← Voltar para habilidades</a>
+      <h1>{{ habilidade.nome|nome_exibicao }}</h1>
+      <p class="lead">{{ habilidade.descricao|default:"Sem descrição cadastrada." }}</p>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'editar_habilidade' habilidade.pk %}" class="btn btn-primary">Editar</a>
+      <a href="{% url 'remover_habilidade' habilidade.pk %}" class="btn btn-secondary danger-text">Excluir</a>
+    </div>
+  </header>
+
+  <div class="section-title">
+    <h2>Pokémon com esta habilidade</h2>
+    <span class="count-pill">{{ vinculos|length }}</span>
+  </div>
+
+  {% if vinculos %}
+  <div class="card table-card">
+    <table class="data-table">
+      <thead><tr><th>Pokémon</th><th>Tipos</th><th>Treinador</th><th>Tipo da habilidade</th><th class="col-num">Slot</th></tr></thead>
+      <tbody>
+        {% for vinculo in vinculos %}
+        {% with pokemon=vinculo.pokemon %}
+        <tr>
+          <td>
+            <a class="pokemon-cell" href="{% url 'detalhes_pokemon' pokemon.pk %}">
+              {% if pokemon.sprite_url %}<img src="{{ pokemon.sprite_url }}" alt="" loading="lazy" />{% else %}<span class="thumb-placeholder">?</span>{% endif %}
+              <span class="pokemon-cell-number">#{{ pokemon.id_pokemon|stringformat:"03d" }}</span>
+              <strong>{{ pokemon.nome }}</strong>
+            </a>
+          </td>
+          <td>
+            {% for tipo in pokemon.tipos %}<span class="type-badge"><span class="dot" style="background: {{ tipo|cor_tipo }};"></span>{{ tipo|title }}</span> {% empty %}—{% endfor %}
+          </td>
+          <td class="muted-cell">{{ pokemon.treinador|default:"—" }}</td>
+          <td><span class="flag {% if vinculo.oculta %}flag-hidden{% endif %}">{% if vinculo.oculta %}Oculta{% else %}Normal{% endif %}</span></td>
+          <td class="col-num"><span class="flag flag-slot">Slot {{ vinculo.ordem }}</span></td>
+        </tr>
+        {% endwith %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card empty-box">
+    <div class="empty-icon">◓</div>
+    <h2>Nenhum Pokémon ainda</h2>
+    <p>Vincule esta habilidade a um Pokémon pela tela de edição da coleção.</p>
+    <a href="{% url 'listar_pokemons' %}" class="btn btn-soft">Ver minha coleção</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

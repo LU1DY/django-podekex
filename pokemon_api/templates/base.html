@@ -11,7 +11,14 @@
   <body>
     <div class="app-layout">
       {% include 'includes/_sidebar.html' %}
-      <main class="page">{% block conteudo %}{% endblock %}</main>
+      <main class="page">
+        {% if messages %}
+        <div class="flash-list" role="status">
+          {% for message in messages %}<div class="flash flash-{{ message.tags }}">{{ message }}</div>{% endfor %}
+        </div>
+        {% endif %}
+        {% block conteudo %}{% endblock %}
+      </main>
     </div>
     {% block scripts %}{% endblock %}
   </body>

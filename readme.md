@@ -36,6 +36,8 @@ Diferente de uma Pokédex tradicional (que só exibe informações fixas de todo
 - 📖 **Minha Coleção** — lista todos os Pokémon salvos, com indicação de favorito e status de captura
 - ✏️ **Editar Pokémon** — permite atualizar qualquer campo do registro salvo
 - 🗑️ **Remover Pokémon** — exclui um Pokémon da coleção, com tela de confirmação
+- 🔎 **Detalhes do Pokémon** — tela que reúne os dados do registro, a **ficha de captura** (1:1) e as **habilidades** (N:N) com a indicação de oculta e o slot
+- ⚡ **Habilidades** — CRUD completo do catálogo (listar com busca, cadastrar, ver detalhes com os Pokémon que a possuem, editar e remover com confirmação)
 
 ---
 
@@ -71,7 +73,7 @@ Diferente de uma Pokédex tradicional (que só exibe informações fixas de todo
 | `tipos` | `JSONField` | Lista com o(s) tipo(s) do Pokémon (ex: `["electric"]`) |
 | `altura` | `CharField` (máx. 20) | Altura do Pokémon, conforme retornado pela PokeAPI |
 | `peso` | `CharField` (máx. 20) | Peso do Pokémon, conforme retornado pela PokeAPI |
-| `habilidades` | `JSONField` | Lista com as habilidades do Pokémon |
+| `habilidades` | `ManyToManyField` (`through=PokemonHabilidade`) | Habilidades do Pokémon (N:N com o catálogo `Habilidade`) |
 | `hp` | `IntegerField` | Atributo base de HP |
 | `ataque` | `IntegerField` | Atributo base de Ataque |
 | `defesa` | `IntegerField` | Atributo base de Defesa |
@@ -88,9 +90,32 @@ Diferente de uma Pokédex tradicional (que só exibe informações fixas de todo
 |---|---|---|
 | `Regiao` | `nome` (único), `numero_inicial`, `numero_final` | 1:N com `Pokemon` (`Regiao.pokemons`) |
 | `Treinador` | `nome`, `cidade_natal`, `data_cadastro` | 1:N com `Pokemon` (`Treinador.pokemons`) |
-| `Habilidade` | `nome` (único), `descricao` | Catálogo de habilidades (será usado no N:N com `through`) |
+| `Habilidade` | `nome` (único), `descricao` | Catálogo de habilidades, usado no N:N com `through` (Semana 2) |
 
 O model `Pokemon` ganhou duas `ForeignKey` opcionais: `treinador` e `regiao`. A região é definida automaticamente a partir do número da Pokédex (Kanto 1–151, Johto 152–251, e assim por diante). As 9 regiões são criadas pela própria migração `0005`.
+
+### Novos models (Semana 2)
+
+| Model | Campos principais | Relacionamento |
+|---|---|---|
+| `Captura` | `apelido`, `nivel` (1–100), `pokebola` (choices), `local`, `data_encontro` | **1:1** com `Pokemon` (`pokemon.captura`, `OneToOneField`, `CASCADE`) |
+| `PokemonHabilidade` | `pokemon`, `habilidade`, `oculta`, `ordem` (slot) | **Tabela intermediária (`through`)** do **N:N** `Pokemon.habilidades` ↔ `Habilidade.pokemons` |
+
+**1:1 — ficha de captura.** Cada Pokémon pode ter no máximo uma ficha (`OneToOneField`). Ela é preenchida na própria tela de adicionar/editar o Pokémon; se todos os campos ficarem vazios, nenhuma ficha é criada (e a existente é removida). A tela **Detalhes do Pokémon** (`/<id>/detalhes_pokemon/`) exibe os dados do Pokémon junto com a ficha.
+
+**N:N com `through`.** `Pokemon.habilidades` é um `ManyToManyField(Habilidade, through='PokemonHabilidade')`. A tabela intermediária guarda dados do próprio vínculo: se a habilidade é **oculta** (`is_hidden` da PokeAPI) e a **ordem/slot**. Há uma `UniqueConstraint` em (`pokemon`, `habilidade`), impedindo repetir a mesma habilidade no mesmo Pokémon. Habilidades digitadas no formulário que ainda não existem entram automaticamente no catálogo (sem duplicar por maiúsculas/minúsculas). Excluir um Pokémon remove seus vínculos; excluir uma `Habilidade` desfaz os vínculos, mas **nunca** apaga os Pokémon.
+
+**CRUD 2 — Habilidade** (segunda entidade do N:N):
+
+| Operação | Rota | View |
+|---|---|---|
+| Listar (com busca `?q=`) | `/listar_habilidades/` | `listar_habilidades` |
+| Criar | `/criar_habilidade/` | `criar_habilidade` |
+| Detalhes (Pokémon que a possuem) | `/<id>/detalhes_habilidade/` | `detalhes_habilidade` |
+| Editar | `/<id>/editar_habilidade/` | `editar_habilidade` |
+| Remover (GET confirma, POST exclui) | `/<id>/remover_habilidade/` | `remover_habilidade` |
+
+> **Migração dos dados antigos:** as migrações `0006` → `0008` criam as novas tabelas, **copiam** as habilidades que estavam no campo JSON `Pokemon.habilidades` para a tabela intermediária (preservando a ordem) e só então removem o campo antigo. A `0007` é reversível.
 
 ### Dashboard
 
@@ -113,9 +138,11 @@ pokedex-monolitico/
 │   ├── migrations/          # Migrações do banco de dados
 │   ├── static/              # CSS e imagens do projeto
 │   ├── templates/           # Templates HTML (base.html + páginas + includes/)
+│   │                        #   detalhes_pokemon, listar/form/detalhes/confirmar_remocao_habilidade
 │   ├── templatetags/        # Filtro customizado (cor por tipo de Pokémon)
-│   ├── models.py            # Model Pokemon
-│   ├── views.py             # Views (home, buscar, salvar, listar, editar, remover)
+│   ├── models.py            # Pokemon, Regiao, Treinador, Habilidade, PokemonHabilidade, Captura
+│   ├── forms.py             # HabilidadeForm e CapturaForm (validação em português)
+│   ├── views.py             # Views (home, buscar, CRUD de Pokémon, detalhes, CRUD de Habilidade)
 │   ├── services.py          # Integração com a PokeAPI
 │   └── urls.py               # Rotas do app
 ├── manage.py
@@ -146,7 +173,7 @@ source venv/bin/activate
 # 3. Instale as dependências
 pip install -r requirements.txt
 
-# 4. Aplique as migrações do banco de dados
+# 4. Aplique as migrações do banco de dados (inclui a migração das habilidades antigas)
 python manage.py migrate
 
 # 5. Rode o servidor de desenvolvimento

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pokemon_extras %}
+{% block titulo %}Habilidades · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/habilidades.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="ability-page">
+  <header class="page-header toolbar-header">
+    <div>
+      <h1>Habilidades</h1>
+      <p>{{ total_catalogo }} habilidade{{ total_catalogo|pluralize }} no catálogo. Cada uma pode ser compartilhada por vários Pokémon.</p>
+    </div>
+    <a href="{% url 'criar_habilidade' %}" class="btn btn-primary">+ Nova habilidade</a>
+  </header>
+
+  {% if total_catalogo %}
+    <form method="get" class="card search-bar">
+      <label class="search-control">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        <input type="search" name="q" value="{{ busca }}" placeholder="Pesquisar por nome ou descrição..." autocomplete="off">
+      </label>
+      <button type="submit" class="btn btn-secondary">Buscar</button>
+      {% if busca %}<a href="{% url 'listar_habilidades' %}" class="btn btn-soft">Limpar</a>{% endif %}
+    </form>
+
+    {% if habilidades %}
+    <div class="card table-card">
+      <table class="data-table">
+        <thead><tr><th>Habilidade</th><th>Descrição</th><th class="col-num">Pokémon</th><th class="col-actions">Ações</th></tr></thead>
+        <tbody>
+          {% for habilidade in habilidades %}
+          <tr>
+            <td><a class="row-title" href="{% url 'detalhes_habilidade' habilidade.pk %}">{{ habilidade.nome|nome_exibicao }}</a></td>
+            <td class="muted-cell">{{ habilidade.descricao|default:"—"|truncatechars:90 }}</td>
+            <td class="col-num"><span class="count-pill">{{ habilidade.total_pokemons }}</span></td>
+            <td class="col-actions">
+              <a href="{% url 'detalhes_habilidade' habilidade.pk %}" class="btn btn-soft">Ver</a>
+              <a href="{% url 'editar_habilidade' habilidade.pk %}" class="btn btn-secondary">Editar</a>
+              <a href="{% url 'remover_habilidade' habilidade.pk %}" class="btn-icon danger" aria-label="Remover {{ habilidade.nome }}">×</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="card empty-box">
+      <div class="empty-icon">⌕</div>
+      <h2>Nenhum resultado</h2>
+      <p>Nenhuma habilidade corresponde a “{{ busca }}”.</p>
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="card empty-box">
+      <div class="empty-icon">⚡</div>
+      <h2>Catálogo vazio</h2>
+      <p>As habilidades são criadas ao salvar um Pokémon, mas você também pode cadastrá-las manualmente.</p>
+      <a href="{% url 'criar_habilidade' %}" class="btn btn-primary">+ Nova habilidade</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

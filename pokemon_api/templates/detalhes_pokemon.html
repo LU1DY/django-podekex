@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pokemon_extras %}
+{% block titulo %}{{ pokemon.nome|title }} · Detalhes · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/detalhes_pokemon.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="detail-page">
+  <header class="page-header detail-header">
+    <div>
+      <a href="{% url 'listar_pokemons' %}" class="back-link">← Voltar para a coleção</a>
+      <h1>Detalhes do Pokémon</h1>
+      <p>Dados do registro e informações relacionadas (ficha de captura e habilidades).</p>
+    </div>
+    <div class="detail-actions">
+      <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-primary">Editar dados</a>
+    </div>
+  </header>
+
+  <article class="card detail-hero">
+    <div class="detail-image dotted-surface">
+      {% if pokemon.sprite_url %}<img src="{{ pokemon.sprite_url }}" alt="{{ pokemon.nome }}" />{% else %}<span class="sprite-placeholder">?</span>{% endif %}
+    </div>
+
+    <div class="detail-info">
+      <span class="detail-number">#{{ pokemon.id_pokemon|stringformat:"03d" }}</span>
+      <h2>{{ pokemon.nome }}{% if captura and captura.apelido %} <small>“{{ captura.apelido }}”</small>{% endif %}</h2>
+
+      <div class="detail-tags">
+        {% for tipo in pokemon.tipos %}
+          <span class="type-badge"><span class="dot" style="background: {{ tipo|cor_tipo }};"></span>{{ tipo|title }}</span>
+        {% empty %}
+          <span class="type-badge muted">Sem tipo</span>
+        {% endfor %}
+        {% if pokemon.regiao %}<span class="region-chip">{{ pokemon.regiao.nome }}</span>{% endif %}
+        <span class="poke-card-status {% if pokemon.capturado %}captured{% else %}not-captured{% endif %}">{% if pokemon.capturado %}✓ Capturado{% else %}○ Não capturado{% endif %}</span>
+        {% if pokemon.favorito %}<span class="poke-card-status favorite-tag">♥ Favorito</span>{% endif %}
+      </div>
+
+      <div class="detail-meta">
+        <div class="detail-meta-item"><span>Treinador</span><strong>{% if pokemon.treinador %}{{ pokemon.treinador.nome }}{% else %}Sem treinador{% endif %}</strong></div>
+        <div class="detail-meta-item"><span>Cidade natal</span><strong>{% if pokemon.treinador and pokemon.treinador.cidade_natal %}{{ pokemon.treinador.cidade_natal }}{% else %}—{% endif %}</strong></div>
+        <div class="detail-meta-item"><span>Altura</span><strong>{{ pokemon.altura|default:"—" }}</strong></div>
+        <div class="detail-meta-item"><span>Peso</span><strong>{{ pokemon.peso|default:"—" }}</strong></div>
+        <div class="detail-meta-item"><span>Adicionado em</span><strong>{{ pokemon.data_captura|date:"d/m/Y" }}</strong></div>
+        <div class="detail-meta-item"><span>Total de atributos</span><strong>{{ pokemon.total_atributos }}</strong></div>
+      </div>
+
+      <div class="detail-stats">
+        {% for atributo in atributos %}
+        <div class="stat-bar">
+          <div class="stat-bar-labels"><span>{{ atributo.rotulo }}</span><strong>{{ atributo.valor }}</strong></div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" style="width: {{ atributo.pct }}%;"></div></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </article>
+
+  <div class="detail-grid">
+    <!-- 1:1 — Pokemon <-> Captura -->
+    <article class="card detail-panel">
+      <div class="panel-heading">
+        <div><span class="eyebrow">RELAÇÃO 1:1</span><h3>Ficha de captura</h3></div>
+      </div>
+      {% if captura %}
+        <dl class="info-list">
+          <div><dt>Apelido</dt><dd>{{ captura.apelido|default:"—" }}</dd></div>
+          <div><dt>Nível</dt><dd>{{ captura.nivel|default_if_none:"—" }}</dd></div>
+          <div><dt>Pokébola usada</dt><dd>{% if captura.pokebola %}{{ captura.get_pokebola_display }}{% else %}—{% endif %}</dd></div>
+          <div><dt>Local da captura</dt><dd>{{ captura.local|default:"—" }}</dd></div>
+          <div><dt>Data do encontro</dt><dd>{% if captura.data_encontro %}{{ captura.data_encontro|date:"d/m/Y" }}{% else %}—{% endif %}</dd></div>
+        </dl>
+      {% else %}
+        <div class="panel-empty">
+          <p>Este Pokémon ainda não tem ficha de captura.</p>
+          <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-soft">Preencher ficha</a>
+        </div>
+      {% endif %}
+    </article>
+
+    <!-- N:N com through — Pokemon <-> Habilidade (PokemonHabilidade) -->
+    <article class="card detail-panel">
+      <div class="panel-heading">
+        <div><span class="eyebrow">RELAÇÃO N:N</span><h3>Habilidades</h3></div>
+        <a href="{% url 'listar_habilidades' %}" class="panel-link">Catálogo →</a>
+      </div>
+      {% if vinculos %}
+        <ul class="ability-list">
+          {% for vinculo in vinculos %}
+          <li>
+            <div class="ability-main">
+              <a href="{% url 'detalhes_habilidade' vinculo.habilidade.pk %}">{{ vinculo.habilidade.nome|nome_exibicao }}</a>
+              <p>{{ vinculo.habilidade.descricao|default:"Sem descrição cadastrada."|truncatechars:110 }}</p>
+            </div>
+            <div class="ability-flags">
+              <span class="flag {% if vinculo.oculta %}flag-hidden{% endif %}">{% if vinculo.oculta %}Oculta{% else %}Normal{% endif %}</span>
+              <span class="flag flag-slot">Slot {{ vinculo.ordem }}</span>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="panel-empty">
+          <p>Nenhuma habilidade vinculada a este Pokémon.</p>
+          <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-soft">Adicionar habilidades</a>
+        </div>
+      {% endif %}
+    </article>
+  </div>
+
+  {% if pokemon.observacoes %}
+  <article class="card detail-panel notes-panel">
+    <div class="panel-heading"><div><span class="eyebrow">ANOTAÇÕES</span><h3>Observações</h3></div></div>
+    <p class="notes-text">{{ pokemon.observacoes|linebreaksbr }}</p>
+  </article>
+  {% endif %}
+</section>
+{% endblock %}
