@@ -1,0 +1,33 @@
+{% load static %}<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d80d2f" />
+    <title>{% block titulo %}Pokédex{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/form_pokemon.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+  </head>
+  <body class="auth-body">
+    <main class="auth-wrap">
+      <div class="auth-brand">
+        <span class="brand-ball" aria-hidden="true"></span>
+        <div>
+          <h1>Pokédex</h1>
+          <span>Minha coleção de treinador</span>
+        </div>
+      </div>
+
+      {% if messages %}
+      <div class="flash-list" role="status">
+        {% for message in messages %}<div class="flash flash-{{ message.tags }}">{{ message }}</div>{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="card auth-card">
+        {% block conteudo %}{% endblock %}
+      </div>
+    </main>
+  </body>
+</html>

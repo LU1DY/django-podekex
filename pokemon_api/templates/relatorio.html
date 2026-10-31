@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pokemon_extras %}
+{% block titulo %}Relatório · Pokédex{% endblock %}
+{% block estilos %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/consultas.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+<section class="report-page">
+  <header class="page-header report-header">
+    <div>
+      <h1>Relatório da coleção</h1>
+      <p>Dados agregados de {{ treinador.nome }} · gerado em {{ gerado_em|date:"d/m/Y H:i" }}</p>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'exportar_relatorio' %}" class="btn btn-primary">⬇ Exportar resumo (CSV)</a>
+      <a href="{% url 'exportar_relatorio' %}?dados=pokemons" class="btn btn-secondary">⬇ Exportar Pokémon (CSV)</a>
+    </div>
+  </header>
+
+  {% if total %}
+  <div class="stats-row report-stats">
+    <article class="card stat-card"><div class="stat-card-top"><span>Pokémon na coleção</span><span class="stat-card-icon">▣</span></div><strong class="stat-card-value">{{ total }}</strong><span class="stat-card-caption">{{ favoritos }} favorito{{ favoritos|pluralize }}</span></article>
+    <article class="card stat-card"><div class="stat-card-top"><span>Capturados</span><span class="stat-card-icon">✓</span></div><strong class="stat-card-value">{{ capturados }}</strong><span class="stat-card-caption">{{ percentual_capturados }}% da coleção · {{ nao_capturados }} pendente{{ nao_capturados|pluralize }}</span></article>
+    <article class="card stat-card"><div class="stat-card-top"><span>Fichas de captura</span><span class="stat-card-icon">◎</span></div><strong class="stat-card-value">{{ total_fichas }}</strong><span class="stat-card-caption">{% if nivel_medio is not None %}Nível médio {{ nivel_medio }}{% else %}Nenhum nível informado{% endif %}</span></article>
+  </div>
+
+  <div class="section-heading"><div><h2>Médias de atributos</h2><p>Média entre todos os Pokémon da coleção.</p></div></div>
+  <div class="stats-row averages-row">
+    <article class="card stat-card"><span class="stat-card-caption">HP</span><strong class="stat-card-value">{{ medias.hp }}</strong></article>
+    <article class="card stat-card"><span class="stat-card-caption">Ataque</span><strong class="stat-card-value">{{ medias.ataque }}</strong></article>
+    <article class="card stat-card"><span class="stat-card-caption">Defesa</span><strong class="stat-card-value">{{ medias.defesa }}</strong></article>
+    <article class="card stat-card"><span class="stat-card-caption">Velocidade</span><strong class="stat-card-value">{{ medias.velocidade }}</strong></article>
+  </div>
+
+  <div class="panels-row report-panels">
+    <article class="card panel">
+      <div class="panel-title"><div><span class="eyebrow">REGIÕES</span><h3>Pokémon por região</h3></div><span class="panel-icon">◇</span></div>
+      <ul class="rank-list">{% for regiao in por_regiao %}<li><span>{{ regiao.nome }}</span><strong>{{ regiao.total }}</strong></li>{% empty %}<li class="rank-empty">Sem dados</li>{% endfor %}</ul>
+    </article>
+    <article class="card panel">
+      <div class="panel-title"><div><span class="eyebrow">TIPOS</span><h3>Pokémon por tipo</h3></div><span class="panel-icon">✣</span></div>
+      <ul class="rank-list">{% for tipo, quantidade in por_tipo %}<li><span><span class="type-dot" style="background: {{ tipo|cor_tipo }};"></span>{{ tipo|title }}</span><strong>{{ quantidade }}</strong></li>{% empty %}<li class="rank-empty">Sem dados</li>{% endfor %}</ul>
+    </article>
+    <article class="card panel">
+      <div class="panel-title"><div><span class="eyebrow">POKÉBOLAS</span><h3>Fichas por pokébola</h3></div><span class="panel-icon">◓</span></div>
+      <ul class="rank-list">{% for linha in por_pokebola %}<li><span>{{ linha.nome }}</span><strong>{{ linha.total }}</strong></li>{% empty %}<li class="rank-empty">Nenhuma pokébola informada</li>{% endfor %}</ul>
+    </article>
+  </div>
+
+  <div class="panels-row report-panels two-cols">
+    <article class="card panel">
+      <div class="panel-title"><div><span class="eyebrow">HABILIDADES</span><h3>Mais comuns na coleção</h3></div><span class="panel-icon">⚡</span></div>
+      <ul class="rank-list">{% for habilidade in top_habilidades %}<li><span><a href="{% url 'detalhes_habilidade' habilidade.pk %}">{{ habilidade.nome|nome_exibicao }}</a></span><strong>{{ habilidade.total }}</strong></li>{% empty %}<li class="rank-empty">Sem dados</li>{% endfor %}</ul>
+    </article>
+    <article class="card panel">
+      <div class="panel-title"><div><span class="eyebrow">DESTAQUES</span><h3>Os 5 mais fortes</h3></div><span class="panel-icon">★</span></div>
+      <ul class="rank-list">{% for pokemon in mais_fortes %}<li><span><a href="{% url 'detalhes_pokemon' pokemon.pk %}">#{{ pokemon.id_pokemon|stringformat:"03d" }} {{ pokemon.nome|title }}</a><small>Soma dos atributos</small></span><strong>{{ pokemon.total_stats }}</strong></li>{% endfor %}</ul>
+    </article>
+  </div>
+  {% else %}
+  <div class="card empty-box">
+    <div class="empty-icon">◓</div>
+    <h2>Nada para relatar ainda</h2>
+    <p>O relatório é calculado a partir da sua coleção. Adicione Pokémon para ver os indicadores.</p>
+    <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">Buscar Pokémon</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

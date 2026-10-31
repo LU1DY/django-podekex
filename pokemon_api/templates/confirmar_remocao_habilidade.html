@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pokemon_extras %}
+{% block titulo %}Remover habilidade · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/habilidades.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="ability-page narrow-page">
+  <div class="card confirm-box">
+    <div class="empty-icon danger-icon">!</div>
+    <h1>Remover “{{ habilidade.nome|nome_exibicao }}”?</h1>
+
+    {% if vinculos %}
+      <p>Esta habilidade está vinculada a <strong>{{ vinculos|length }} Pokémon</strong>. Ao removê-la, esses vínculos serão desfeitos, mas os Pokémon continuam na sua coleção.</p>
+      <ul class="chip-list">
+        {% for vinculo in vinculos %}<li>#{{ vinculo.pokemon.id_pokemon|stringformat:"03d" }} {{ vinculo.pokemon.nome }}</li>{% endfor %}
+      </ul>
+    {% else %}
+      <p>Nenhum Pokémon usa esta habilidade. A remoção não afeta a sua coleção.</p>
+    {% endif %}
+    <p class="warning-note">Esta ação não pode ser desfeita.</p>
+
+    <form method="post" class="confirm-actions">
+      {% csrf_token %}
+      <a href="{% url 'detalhes_habilidade' habilidade.pk %}" class="btn btn-secondary">Cancelar</a>
+      <button type="submit" class="btn btn-primary">Sim, remover</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

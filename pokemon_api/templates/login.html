@@ -1,0 +1,27 @@
+{% extends 'base_auth.html' %}
+{% block titulo %}Entrar · Pokédex{% endblock %}
+{% block conteudo %}
+<h2>Entrar na conta</h2>
+<p class="auth-sub">Acesse a sua coleção de Pokémon.</p>
+
+<form method="post" class="pokemon-form" novalidate>
+  {% csrf_token %}
+  {% for erro in form.non_field_errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+
+  <div class="form-field">
+    <label for="{{ form.username.id_for_label }}">Nome de usuário</label>
+    {{ form.username }}
+    {% for erro in form.username.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+  </div>
+  <div class="form-field">
+    <label for="{{ form.password.id_for_label }}">Senha</label>
+    {{ form.password }}
+    {% for erro in form.password.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+  </div>
+
+  <input type="hidden" name="next" value="{{ next }}" />
+  <button type="submit" class="btn btn-primary auth-submit">Entrar</button>
+</form>
+
+<p class="auth-foot">Ainda não tem conta? <a href="{% url 'registrar' %}">Cadastre-se</a></p>
+{% endblock %}
