@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}Alterar senha · Pokédex{% endblock %}
+{% block estilos %}
+<link rel="stylesheet" href="{% static 'css/form_pokemon.css' %}">
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+<section class="narrow-page">
+  <header class="page-header form-page-header">
+    <a href="{% url 'perfil' %}" class="back-link">← Voltar ao perfil</a>
+    <h1>Alterar senha</h1>
+    <p>Informe a senha atual e escolha uma nova.</p>
+  </header>
+
+  <form method="post" class="pokemon-form" novalidate>
+    {% csrf_token %}
+    <div class="card form-section">
+      <div class="form-section-title">Senha</div>
+      {% for campo in form %}
+      <div class="form-field profile-field">
+        <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo }}
+        {% for erro in campo.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        {% if campo.help_text %}<span class="field-hint">{{ campo.help_text|safe }}</span>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'perfil' %}" class="btn btn-secondary">Cancelar</a>
+      <button type="submit" class="btn btn-primary">Alterar senha</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

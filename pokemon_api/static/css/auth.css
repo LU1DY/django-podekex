@@ -1,0 +1,29 @@
+.auth-body { min-height: 100vh; }
+.auth-wrap { width: min(100%, 420px); margin: 0 auto; padding: 48px 16px 64px; }
+.auth-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.auth-brand h1 { font-size: 20px; line-height: 1.1; letter-spacing: -.02em; }
+.auth-brand span:not(.brand-ball) { display: block; color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+.auth-brand .brand-ball { width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; position: relative; border: 2px solid #232020; background: linear-gradient(to bottom, var(--red) 0 45%, #232020 45% 55%, #fff 55% 100%); }
+.auth-brand .brand-ball::after { content: ""; position: absolute; width: 11px; height: 11px; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 2px solid #232020; border-radius: 50%; background: #fff; }
+.auth-card { padding: 26px; }
+.auth-card h2 { font-size: 22px; letter-spacing: -.03em; }
+.auth-sub { color: var(--text-muted); font-size: 12px; margin: 4px 0 20px; }
+.auth-card .pokemon-form { gap: 14px; }
+.auth-submit { width: 100%; margin-top: 4px; }
+.auth-foot { margin-top: 18px; text-align: center; font-size: 12px; color: var(--text-muted); }
+.auth-foot a { color: var(--red); font-weight: 700; }
+.auth-card .field-hint ul { margin: 4px 0 0 14px; }
+
+.narrow-page { max-width: 640px; }
+.narrow-page .pokemon-form, .narrow-page > .card { margin-bottom: 17px; }
+.profile-field + .profile-field { margin-top: 15px; }
+.profile-list { display: grid; gap: 12px; }
+.profile-list div { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); font-size: 12px; }
+.profile-list div:last-child { border-bottom: 0; padding-bottom: 0; }
+.profile-list dt { color: var(--text-muted); }
+.profile-list dd { font-weight: 650; text-align: right; }
+.profile-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+.profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.profile-stats div { padding: 14px; border-radius: 12px; background: var(--surface-muted); text-align: center; }
+.profile-stats strong { display: block; font-size: 22px; letter-spacing: -.03em; }
+.profile-stats span { color: var(--text-muted); font-size: 10px; }

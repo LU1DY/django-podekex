@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}Editar perfil · Pokédex{% endblock %}
+{% block estilos %}
+<link rel="stylesheet" href="{% static 'css/form_pokemon.css' %}">
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+<section class="narrow-page">
+  <header class="page-header form-page-header">
+    <a href="{% url 'perfil' %}" class="back-link">← Voltar ao perfil</a>
+    <h1>Editar perfil</h1>
+    <p>Atualize os seus dados de treinador.</p>
+  </header>
+
+  <form method="post" class="pokemon-form" novalidate>
+    {% csrf_token %}
+    <div class="card form-section">
+      <div class="form-section-title">Seus dados</div>
+      {% for campo in form %}
+      <div class="form-field profile-field">
+        <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo }}
+        {% for erro in campo.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'perfil' %}" class="btn btn-secondary">Cancelar</a>
+      <button type="submit" class="btn btn-primary">Salvar perfil</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

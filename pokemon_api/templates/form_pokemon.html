@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}{% if titulo %}Editar{% else %}Adicionar{% endif %} Pokémon · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/form_pokemon.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="edit-page">
+  <header class="page-header form-page-header">
+    <h1>{% if titulo %}Editar Pokémon{% else %}Adicionar Pokémon{% endif %}</h1>
+    <p>{% if titulo %}Atualize os dados de {{ titulo }} na sua coleção.{% else %}Preencha os dados para registrar um novo Pokémon na sua coleção.{% endif %}</p>
+  </header>
+
+  <form method="POST" class="pokemon-form">
+    {% csrf_token %}
+
+    <div class="card form-section">
+      <div class="form-section-title">Identificação</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="id_nome">Nome</label>
+          <input type="text" id="id_nome" name="nome" placeholder="Ex: Pikachu" required maxlength="100" value="{{ pokemon.nome|default:'' }}" />
+        </div>
+        <div class="form-field">
+          <label for="id_pokemon">Número da Pokédex</label>
+          <input type="number" id="id_pokemon" name="id_pokemon" placeholder="Ex: 25" required min="1" value="{{ pokemon.id_pokemon|default:'' }}" />
+          <span class="field-hint">A região é definida automaticamente pelo número da Pokédex.</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Tipo(s)</label>
+          <div class="repeat-field compact-repeat">
+            {% if pokemon.tipos %}
+              {% for tipo in pokemon.tipos %}<input type="text" name="tipos" placeholder="Ex: electric" maxlength="50" value="{{ tipo }}" />{% endfor %}
+            {% else %}
+              <input type="text" name="tipos" placeholder="Ex: electric" maxlength="50" />
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Habilidades</div>
+      <div class="form-field">
+        <div class="ability-rows" id="habilidadeRows">
+          {% for habilidade in habilidades_form %}
+          <div class="ability-row" data-ability-row>
+            <input type="text" name="habilidade_nome" list="listaHabilidades" placeholder="Ex: static" maxlength="100" value="{{ habilidade.nome }}" />
+            <select name="habilidade_oculta" aria-label="Tipo da habilidade">
+              <option value="0">Normal</option>
+              <option value="1"{% if habilidade.oculta %} selected{% endif %}>Oculta</option>
+            </select>
+            <button type="button" class="btn-icon danger" data-remove-ability aria-label="Remover habilidade">×</button>
+          </div>
+          {% empty %}
+          <div class="ability-row" data-ability-row>
+            <input type="text" name="habilidade_nome" list="listaHabilidades" placeholder="Ex: static" maxlength="100" />
+            <select name="habilidade_oculta" aria-label="Tipo da habilidade">
+              <option value="0">Normal</option>
+              <option value="1">Oculta</option>
+            </select>
+            <button type="button" class="btn-icon danger" data-remove-ability aria-label="Remover habilidade">×</button>
+          </div>
+          {% endfor %}
+        </div>
+        <button type="button" class="btn btn-soft add-ability" id="addHabilidade">+ Adicionar habilidade</button>
+        <span class="field-hint">Escolha uma habilidade do catálogo ou digite uma nova: ela é criada automaticamente. A ordem das linhas define o slot.</span>
+        <datalist id="listaHabilidades">{% for nome in catalogo_habilidades %}<option value="{{ nome }}"></option>{% endfor %}</datalist>
+        <template id="habilidadeTemplate">
+          <div class="ability-row" data-ability-row>
+            <input type="text" name="habilidade_nome" list="listaHabilidades" placeholder="Ex: static" maxlength="100" />
+            <select name="habilidade_oculta" aria-label="Tipo da habilidade">
+              <option value="0">Normal</option>
+              <option value="1">Oculta</option>
+            </select>
+            <button type="button" class="btn-icon danger" data-remove-ability aria-label="Remover habilidade">×</button>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Treinador e cidade</div>
+      <div class="trainer-fields">
+        <div class="form-field">
+          <label for="id_treinador">Treinador responsável</label>
+          <select id="id_treinador" name="treinador">
+            {% for treinador in treinadores %}
+              <option value="{{ treinador.pk }}" data-city="{{ treinador.cidade_natal }}" selected>
+                {{ treinador.nome }}{% if treinador.cidade_natal %} — {{ treinador.cidade_natal }}{% endif %}
+              </option>
+            {% endfor %}
+          </select>
+          <span class="field-hint">Todo Pokémon salvo fica vinculado ao seu perfil de treinador.</span>
+        </div>
+        <div class="city-preview">
+          <span>Cidade natal</span>
+          <strong id="trainerCity">{% if pokemon.treinador and pokemon.treinador.cidade_natal %}{{ pokemon.treinador.cidade_natal }}{% else %}Não informada{% endif %}</strong>
+          <small>Vinculada ao treinador selecionado.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Ficha de captura</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="{{ captura_form.apelido.id_for_label }}">Apelido</label>
+          {{ captura_form.apelido }}
+          {% for erro in captura_form.apelido.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        </div>
+        <div class="form-field">
+          <label for="{{ captura_form.nivel.id_for_label }}">Nível</label>
+          {{ captura_form.nivel }}
+          {% for erro in captura_form.nivel.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="{{ captura_form.pokebola.id_for_label }}">Pokébola usada</label>
+          {{ captura_form.pokebola }}
+          {% for erro in captura_form.pokebola.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        </div>
+        <div class="form-field">
+          <label for="{{ captura_form.data_encontro.id_for_label }}">Data do encontro</label>
+          {{ captura_form.data_encontro }}
+          {% for erro in captura_form.data_encontro.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="{{ captura_form.local.id_for_label }}">Local da captura</label>
+          {{ captura_form.local }}
+          {% for erro in captura_form.local.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+          <span class="field-hint">Opcional. Com todos os campos vazios, nenhuma ficha é criada (e a ficha existente é removida).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="form-section-title">Atributos</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="id_altura">Altura</label>
+          <input type="text" id="id_altura" name="altura" placeholder="Ex: 0.4 m" maxlength="20" value="{{ pokemon.altura|default:'' }}" />
+        </div>
+        <div class="form-field">
+          <label for="id_peso">Peso</label>
+          <input type="text" id="id_peso" name="peso" placeholder="Ex: 6.0 kg" maxlength="20" value="{{ pokemon.peso|default:'' }}" />
+        </div>
+      </div>
+
+      <div class="form-row cols-4 stats-fields">
+        <div class="form-field"><label for="id_hp">HP</label><input type="number" id="id_hp" name="hp" min="0" value="{{ pokemon.hp|default:0 }}" /></div>
+        <div class="form-field"><label for="id_ataque">Ataque</label><input type="number" id="id_ataque" name="ataque" min="0" value="{{ pokemon.ataque|default:0 }}" /></div>
+        <div class="form-field"><label for="id_defesa">Defesa</label><input type="number" id="id_defesa" name="defesa" min="0" value="{{ pokemon.defesa|default:0 }}" /></div>
+        <div class="form-field"><label for="id_velocidade">Velocidade</label><input type="number" id="id_velocidade" name="velocidade" min="0" value="{{ pokemon.velocidade|default:0 }}" /></div>
+      </div>
+
+      <div class="form-field notes-field">
+        <label for="id_observacoes">Observações</label>
+        <textarea id="id_observacoes" name="observacoes" placeholder="Onde foi capturado, estratégia de treino, observações sobre o treinador...">{{ pokemon.observacoes|default:'' }}</textarea>
+      </div>
+    </div>
+
+    <div class="card form-section media-section">
+      <div class="form-section-title">Imagem</div>
+      <div class="media-row">
+        <div class="form-field media-input">
+          <label for="id_sprite_url">URL da imagem (sprite)</label>
+          <input type="url" name="sprite_url" id="id_sprite_url" placeholder="https://..." value="{{ pokemon.sprite_url|default:'' }}" />
+          <span class="field-hint">Ao adicionar pela busca, a imagem da PokéAPI já vem preenchida.</span>
+        </div>
+        <div class="sprite-preview dotted-surface">
+          {% if pokemon.sprite_url %}<img src="{{ pokemon.sprite_url }}" alt="Pré-visualização de {{ pokemon.nome }}" />{% else %}<span>Sem imagem</span>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card form-section toggle-section">
+      <div class="toggle-row">
+        <div><strong>Capturado</strong><span class="hint">Indica que o Pokémon já faz parte da equipe/coleção.</span></div>
+        <label class="switch"><input type="checkbox" id="id_capturado" name="capturado" {% if pokemon.capturado %}checked{% endif %}><span class="switch-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><strong>Favorito</strong><span class="hint">Destaca o Pokémon na página inicial.</span></div>
+        <label class="switch"><input type="checkbox" id="id_favorito" name="favorito" {% if pokemon.favorito %}checked{% endif %}><span class="switch-track"></span></label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'listar_pokemons' %}" class="btn btn-secondary">Cancelar</a>
+      <button type="submit" class="btn btn-primary">Salvar Pokémon</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(() => {
+  const select = document.querySelector('#id_treinador');
+  const city = document.querySelector('#trainerCity');
+  if (!select || !city) return;
+  const updateCity = () => {
+    const option = select.options[select.selectedIndex];
+    city.textContent = option?.dataset.city || 'Não informada';
+  };
+  select.addEventListener('change', updateCity);
+  updateCity();
+})();
+
+(() => {
+  const rows = document.querySelector('#habilidadeRows');
+  const add = document.querySelector('#addHabilidade');
+  const template = document.querySelector('#habilidadeTemplate');
+  if (!rows || !add || !template) return;
+
+  add.addEventListener('click', () => {
+    rows.appendChild(template.content.cloneNode(true));
+    rows.lastElementChild.querySelector('input')?.focus();
+  });
+  rows.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-remove-ability]');
+    if (button) button.closest('[data-ability-row]').remove();
+  });
+})();
+</script>
+{% endblock %}

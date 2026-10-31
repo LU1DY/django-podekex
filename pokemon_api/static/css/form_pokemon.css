@@ -1,0 +1,57 @@
+.form-page-header { margin-bottom: 20px; }
+.pokemon-form { display: grid; gap: 17px; }
+.form-section { padding: 22px; }
+.form-section-title { margin-bottom: 17px; color: #655f5b; font-size: 10px; font-weight: 800; letter-spacing: .065em; text-transform: uppercase; }
+.form-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 15px; }
+.form-row + .form-row { margin-top: 15px; }
+.form-row.cols-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+.form-field { min-width: 0; }
+.form-field label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 650; }
+.form-field input, .form-field select, .form-field textarea { width: 100%; min-height: 38px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 9px; outline: 0; background: #fff; color: var(--text-main); font-size: 11px; transition: border-color .15s, box-shadow .15s; }
+.form-field textarea { min-height: 86px; resize: vertical; line-height: 1.5; }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #e19aa6; box-shadow: 0 0 0 3px rgba(216,13,47,.055); }
+.form-field input::placeholder, .form-field textarea::placeholder { color: #b1aaa5; }
+.field-hint { display: block; margin-top: 5px; color: var(--text-muted); font-size: 9px; line-height: 1.4; }
+.repeat-field { display: grid; gap: 7px; }
+.compact-repeat { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.ability-rows { display: grid; gap: 8px; margin-bottom: 10px; }
+.ability-row { display: grid; grid-template-columns: minmax(0, 1fr) 130px 36px; gap: 8px; align-items: center; }
+.add-ability { margin-bottom: 4px; }
+.field-error { display: block; margin-top: 5px; color: var(--red); font-size: 10px; font-weight: 650; }
+.trainer-fields { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(190px,.7fr); gap: 15px; align-items: stretch; }
+.city-preview { min-height: 76px; padding: 12px 14px; border-radius: 11px; background: var(--surface-muted); display: flex; flex-direction: column; justify-content: center; }
+.city-preview span { color: var(--text-muted); font-size: 9px; }
+.city-preview strong { margin: 4px 0 2px; font-size: 13px; }
+.city-preview small { color: var(--text-muted); font-size: 8px; }
+.stats-fields { margin-top: 15px !important; }
+.notes-field { margin-top: 15px; }
+.media-row { display: grid; grid-template-columns: minmax(0,1fr) 128px; gap: 18px; align-items: stretch; }
+.media-input { align-self: center; }
+.sprite-preview { min-height: 104px; border: 1px solid var(--border); border-radius: 12px; display: grid; place-items: center; overflow: hidden; }
+.sprite-preview img { width: 90px; height: 90px; object-fit: contain; }
+.sprite-preview span { color: var(--text-muted); font-size: 9px; }
+.toggle-section { padding-block: 7px; }
+.toggle-row { min-height: 62px; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 10px 3px; }
+.toggle-row + .toggle-row { border-top: 1px solid var(--border); }
+.toggle-row strong { display: block; font-size: 11px; }
+.toggle-row .hint { display: block; margin-top: 3px; color: var(--text-muted); font-size: 9px; }
+.switch { width: 39px; height: 22px; position: relative; flex: 0 0 auto; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch-track { position: absolute; inset: 0; border-radius: 999px; background: #dedad7; cursor: pointer; transition: background .15s; }
+.switch-track::before { content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.16); transition: transform .15s; }
+.switch input:checked + .switch-track { background: var(--red); }
+.switch input:checked + .switch-track::before { transform: translateX(17px); }
+.form-actions { display: flex; justify-content: flex-end; gap: 9px; padding-top: 2px; }
+
+@media (max-width: 820px) {
+  .form-row.cols-4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .trainer-fields { grid-template-columns: 1fr; }
+}
+@media (max-width: 580px) {
+  .form-section { padding: 18px; }
+  .form-row, .form-row.cols-4, .compact-repeat, .media-row { grid-template-columns: 1fr; }
+  .ability-row { grid-template-columns: minmax(0, 1fr) 110px 36px; }
+  .sprite-preview { min-height: 120px; }
+  .form-actions { flex-direction: column-reverse; }
+  .form-actions .btn { width: 100%; }
+}

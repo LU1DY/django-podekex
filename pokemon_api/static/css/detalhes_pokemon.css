@@ -1,0 +1,67 @@
+/* Tela de detalhes do Pokémon (1:1 e N:N) */
+.detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 22px; }
+.detail-actions { display: flex; gap: 8px; flex: 0 0 auto; }
+
+.detail-hero { padding: 22px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; margin-bottom: 18px; }
+.detail-image { min-height: 240px; border-radius: 14px; display: grid; place-items: center; overflow: hidden; }
+.detail-image img { width: 170px; height: 170px; object-fit: contain; }
+.detail-info { min-width: 0; align-self: center; }
+.detail-number { display: block; color: var(--text-muted); font-size: 10px; font-weight: 700; margin-bottom: 3px; }
+.detail-info h2 { font-size: 26px; text-transform: capitalize; letter-spacing: -.03em; }
+.detail-info h2 small { color: var(--text-muted); font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.detail-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 9px 0 18px; }
+.favorite-tag { color: var(--red); }
+
+.detail-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+.detail-meta-item { min-width: 0; padding: 10px 12px; border-radius: 11px; background: var(--surface-muted); }
+.detail-meta-item span { display: block; color: var(--text-muted); font-size: 9px; margin-bottom: 3px; }
+.detail-meta-item strong { display: block; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.detail-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 11px 22px; }
+.stat-bar { display: grid; gap: 5px; }
+.stat-bar-labels { display: flex; align-items: center; justify-content: space-between; color: var(--text-muted); font-size: 10px; }
+.stat-bar-labels strong { color: var(--text-main); font-size: 10px; }
+.stat-bar-track { height: 6px; overflow: hidden; border-radius: 99px; background: #eeeae7; }
+.stat-bar-fill { height: 100%; border-radius: inherit; background: var(--red); }
+
+.detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 18px; align-items: start; margin-bottom: 18px; }
+.detail-panel { padding: 20px; }
+.panel-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.panel-heading h3 { font-size: 15px; }
+.eyebrow { display: block; margin-bottom: 3px; color: var(--text-muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+.panel-link { color: var(--text-muted); font-size: 11px; font-weight: 700; }
+.panel-link:hover { color: var(--red); }
+
+.info-list { display: grid; }
+.info-list > div { display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.info-list > div:last-child { border-bottom: 0; }
+.info-list dt { color: var(--text-muted); }
+.info-list dd { font-weight: 650; text-align: right; }
+
+.ability-list { list-style: none; }
+.ability-list li { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.ability-list li:last-child { border-bottom: 0; }
+.ability-main { min-width: 0; }
+.ability-main a { font-size: 13px; font-weight: 700; }
+.ability-main a:hover { color: var(--red); }
+.ability-main p { margin-top: 3px; color: var(--text-muted); font-size: 11px; line-height: 1.45; }
+.ability-flags { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex: 0 0 auto; }
+.flag { display: inline-block; padding: 4px 9px; border-radius: 999px; background: var(--surface-muted); font-size: 10px; font-weight: 650; white-space: nowrap; }
+.flag-hidden { background: var(--red-light); color: var(--red); }
+.flag-slot { color: var(--text-muted); }
+
+.panel-empty { padding: 18px 6px 6px; text-align: center; }
+.panel-empty p { margin-bottom: 12px; color: var(--text-muted); font-size: 12px; }
+.notes-text { color: #4f4a46; font-size: 12px; line-height: 1.6; }
+
+@media (max-width: 900px) {
+  .detail-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .detail-header { flex-direction: column; align-items: stretch; }
+  .detail-actions .btn { flex: 1; }
+  .detail-hero { grid-template-columns: 1fr; padding: 18px; }
+  .detail-image { min-height: 190px; }
+  .detail-meta { grid-template-columns: 1fr 1fr; }
+  .detail-stats { grid-template-columns: 1fr; }
+}

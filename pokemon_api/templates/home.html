@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}Início · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/home.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="dashboard-page">
+  <div class="card hero-card dotted-surface">
+    <span class="hero-tag">✣ Pokédex do Treinador</span>
+    <h1>Olá, Treinador!</h1>
+    <p>Gerencie sua coleção de Pokémon, treinadores e cidades.</p>
+    <div class="hero-actions">
+      <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">⌕ Buscar Pokémon</a>
+      <a href="{% url 'listar_pokemons' %}" class="btn btn-secondary">Ver minha coleção <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+
+  <div class="stats-row primary-stats">
+    <article class="card stat-card">
+      <div class="stat-card-top"><span>Pokémon na coleção</span><span class="stat-card-icon">▣</span></div>
+      <strong class="stat-card-value">{{ total_colecao }}</strong>
+      <span class="stat-card-caption">Registros cadastrados</span>
+    </article>
+    <article class="card stat-card">
+      <div class="stat-card-top"><span>Treinadores</span><span class="stat-card-icon">◎</span></div>
+      <strong class="stat-card-value">{{ total_treinadores }}</strong>
+      <span class="stat-card-caption">Treinadores cadastrados</span>
+    </article>
+    <article class="card stat-card">
+      <div class="stat-card-top"><span>Cidades</span><span class="stat-card-icon">⌖</span></div>
+      <strong class="stat-card-value">{{ total_cidades }}</strong>
+      <span class="stat-card-caption">Cidades natais registradas</span>
+    </article>
+  </div>
+
+  <div class="section-heading">
+    <div>
+      <h2>Pokémon favoritos</h2>
+      <p>Os destaques da sua coleção.</p>
+    </div>
+    <a href="{% url 'listar_pokemons' %}">Ver todos</a>
+  </div>
+
+  {% if favoritos %}
+  <div class="favorites-grid">
+    {% for pokemon in favoritos %}
+      {% include 'includes/_pokemon_card.html' with pokemon=pokemon compacto=True %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card inline-empty">
+    <span>♡</span>
+    <div><strong>Nenhum favorito ainda</strong><p>Marque Pokémon como favoritos durante a edição.</p></div>
+  </div>
+  {% endif %}
+
+  <div class="section-heading overview-heading">
+    <div>
+      <h2>Visão geral</h2>
+      <p>Indicadores e relações dos dados cadastrados.</p>
+    </div>
+  </div>
+
+  <div class="stats-row compact-stats">
+    <article class="card stat-card"><div class="stat-card-top"><span>Capturados</span><span class="stat-card-icon">✓</span></div><strong class="stat-card-value">{{ total_capturados }}</strong><span class="stat-card-caption">De {{ total_colecao }} na coleção</span></article>
+    <article class="card stat-card"><div class="stat-card-top"><span>Tipos descobertos</span><span class="stat-card-icon">✣</span></div><strong class="stat-card-value">{{ tipos_descobertos }}</strong><span class="stat-card-caption">De 18 tipos possíveis</span></article>
+    <article class="card stat-card"><div class="stat-card-top"><span>Regiões</span><span class="stat-card-icon">◇</span></div><strong class="stat-card-value">{{ total_regioes }}</strong><span class="stat-card-caption">Com Pokémon cadastrados</span></article>
+  </div>
+
+  <div class="panels-row">
+    <article class="card panel">
+      <div class="panel-title"><div><span class="eyebrow">REGIÕES</span><h3>Pokémon por região</h3></div><span class="panel-icon">◇</span></div>
+      {% if por_regiao %}<ul class="rank-list">{% for regiao in por_regiao %}<li><span>{{ regiao.nome }}</span><strong>{{ regiao.total }}</strong></li>{% endfor %}</ul>{% else %}<p class="empty-message">Nenhum Pokémon com região ainda.</p>{% endif %}
+    </article>
+
+    <article class="card panel">
+      <div class="panel-title"><div><span class="eyebrow">TREINADORES</span><h3>Pokémon por treinador</h3></div><span class="panel-icon">◎</span></div>
+      <ul class="rank-list">{% for treinador in por_treinador %}<li><span>{{ treinador.nome }}{% if treinador.cidade_natal %}<small>{{ treinador.cidade_natal }}</small>{% endif %}</span><strong>{{ treinador.total }}</strong></li>{% empty %}<li class="rank-empty">Nenhum treinador cadastrado</li>{% endfor %}{% if sem_treinador %}<li><span>Sem treinador</span><strong>{{ sem_treinador }}</strong></li>{% endif %}</ul>
+    </article>
+
+    <article class="card panel">
+      <div class="panel-title"><div><span class="eyebrow">CIDADES</span><h3>Treinadores por cidade</h3></div><span class="panel-icon">⌖</span></div>
+      {% if por_cidade %}<ul class="rank-list">{% for cidade in por_cidade %}<li><span>{{ cidade.cidade_natal }}</span><strong>{{ cidade.total }}</strong></li>{% endfor %}</ul>{% else %}<p class="empty-message">Nenhuma cidade natal registrada.</p>{% endif %}
+    </article>
+  </div>
+
+  <div class="section-heading recent-heading">
+    <div><h2>Adicionados recentemente</h2><p>Os últimos Pokémon salvos na coleção.</p></div>
+  </div>
+
+  {% if recentes %}
+  <div class="card table-card">
+    <table class="recent-table">
+      <thead><tr><th>Pokémon</th><th>Região</th><th>Treinador</th><th>Cidade</th><th>Adicionado em</th></tr></thead>
+      <tbody>
+        {% for pokemon in recentes %}
+        <tr>
+          <td><div class="table-pokemon"><span>#{{ pokemon.id_pokemon|stringformat:"03d" }}</span><strong>{{ pokemon.nome }}</strong></div></td>
+          <td>{{ pokemon.regiao|default:"—" }}</td>
+          <td>{{ pokemon.treinador|default:"—" }}</td>
+          <td>{% if pokemon.treinador and pokemon.treinador.cidade_natal %}{{ pokemon.treinador.cidade_natal }}{% else %}—{% endif %}</td>
+          <td>{{ pokemon.data_captura|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="empty-message">Nenhum Pokémon salvo ainda.</p>
+  {% endif %}
+</section>
+{% endblock %}

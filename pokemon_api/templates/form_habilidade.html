@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}{% if habilidade %}Editar{% else %}Nova{% endif %} habilidade · Pokédex{% endblock %}
+{% block estilos %}
+<link rel="stylesheet" href="{% static 'css/form_pokemon.css' %}">
+<link rel="stylesheet" href="{% static 'css/habilidades.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+<section class="ability-page narrow-page">
+  <header class="page-header form-page-header">
+    <a href="{% if habilidade %}{% url 'detalhes_habilidade' habilidade.pk %}{% else %}{% url 'listar_habilidades' %}{% endif %}" class="back-link">← Voltar</a>
+    <h1>{% if habilidade %}Editar habilidade{% else %}Nova habilidade{% endif %}</h1>
+    <p>{% if habilidade %}Atualize os dados de {{ habilidade.nome }}.{% else %}Cadastre uma habilidade para vinculá-la aos seus Pokémon.{% endif %}</p>
+  </header>
+
+  <form method="post" class="pokemon-form" novalidate>
+    {% csrf_token %}
+    <div class="card form-section">
+      <div class="form-section-title">Dados da habilidade</div>
+      <div class="form-field">
+        <label for="{{ form.nome.id_for_label }}">Nome</label>
+        {{ form.nome }}
+        {% for erro in form.nome.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+        <span class="field-hint">Use o nome como aparece na PokéAPI (ex: lightning-rod) para evitar duplicidade.</span>
+      </div>
+      <div class="form-field notes-field">
+        <label for="{{ form.descricao.id_for_label }}">Descrição</label>
+        {{ form.descricao }}
+        {% for erro in form.descricao.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% if habilidade %}{% url 'detalhes_habilidade' habilidade.pk %}{% else %}{% url 'listar_habilidades' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
+      <button type="submit" class="btn btn-primary">Salvar habilidade</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
