@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}Meu perfil · Pokédex{% endblock %}
+{% block estilos %}
+<link rel="stylesheet" href="{% static 'css/form_pokemon.css' %}">
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+<section class="narrow-page">
+  <header class="page-header form-page-header">
+    <h1>Meu perfil</h1>
+    <p>Dados da sua conta e resumo da sua coleção.</p>
+  </header>
+
+  <div class="card form-section">
+    <div class="form-section-title">Dados do treinador</div>
+    <dl class="profile-list">
+      <div><dt>Nome</dt><dd>{{ treinador.nome }}</dd></div>
+      <div><dt>Cidade natal</dt><dd>{{ treinador.cidade_natal|default:"Não informada" }}</dd></div>
+      <div><dt>Usuário</dt><dd>{{ user.username }}</dd></div>
+      <div><dt>Treinador desde</dt><dd>{{ treinador.data_cadastro|date:"d/m/Y" }}</dd></div>
+    </dl>
+    <div class="profile-actions">
+      <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar perfil</a>
+    </div>
+  </div>
+
+  <div class="card form-section">
+    <div class="form-section-title">Minha coleção</div>
+    <div class="profile-stats">
+      <div><strong>{{ total }}</strong><span>Pokémon</span></div>
+      <div><strong>{{ total_capturados }}</strong><span>Capturados</span></div>
+      <div><strong>{{ total_favoritos }}</strong><span>Favoritos</span></div>
+    </div>
+    <div class="profile-actions">
+      <a href="{% url 'listar_pokemons' %}" class="btn btn-soft">Ver minha coleção</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

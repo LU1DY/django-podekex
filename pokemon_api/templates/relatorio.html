@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pokemon_extras %}
+{% block titulo %}Relatório · Pokédex{% endblock %}
+{% block estilos %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/consultas.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+<section class="report-page">
+  <header class="page-header report-header">
+    <div>
+      <h1>Relatório da coleção</h1>
+      <p>Dados agregados dos Pokémon que você salvou.</p>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'exportar_relatorio' %}" class="btn btn-primary">⬇ Exportar (CSV)</a>
+    </div>
+  </header>
+
+  {% if total %}
+  <div class="stats-row report-stats">
+    <article class="card stat-card"><div class="stat-card-top"><span>Pokémon na coleção</span></div><strong class="stat-card-value">{{ total }}</strong><span class="stat-card-caption">{{ favoritos }} favorito{{ favoritos|pluralize }}</span></article>
+    <article class="card stat-card"><div class="stat-card-top"><span>Capturados</span></div><strong class="stat-card-value">{{ capturados }}</strong><span class="stat-card-caption">{{ percentual }}% da coleção</span></article>
+  </div>
+
+  <div class="section-heading"><div><h2>Médias de atributos</h2></div></div>
+  <div class="stats-row averages-row">
+    <article class="card stat-card"><span class="stat-card-caption">HP</span><strong class="stat-card-value">{{ medias.hp|floatformat:1 }}</strong></article>
+    <article class="card stat-card"><span class="stat-card-caption">Ataque</span><strong class="stat-card-value">{{ medias.ataque|floatformat:1 }}</strong></article>
+    <article class="card stat-card"><span class="stat-card-caption">Defesa</span><strong class="stat-card-value">{{ medias.defesa|floatformat:1 }}</strong></article>
+    <article class="card stat-card"><span class="stat-card-caption">Velocidade</span><strong class="stat-card-value">{{ medias.velocidade|floatformat:1 }}</strong></article>
+  </div>
+
+  <div class="panels-row report-panels">
+    <article class="card panel">
+      <div class="panel-title"><div><h3>Pokémon por região</h3></div></div>
+      <ul class="rank-list">{% for regiao in por_regiao %}<li><span>{{ regiao.nome }}</span><strong>{{ regiao.total }}</strong></li>{% empty %}<li class="rank-empty">Sem dados</li>{% endfor %}</ul>
+    </article>
+    <article class="card panel">
+      <div class="panel-title"><div><h3>Pokémon por tipo</h3></div></div>
+      <ul class="rank-list">{% for tipo, quantidade in por_tipo %}<li><span><span class="type-dot" style="background: {{ tipo|cor_tipo }};"></span>{{ tipo|title }}</span><strong>{{ quantidade }}</strong></li>{% empty %}<li class="rank-empty">Sem dados</li>{% endfor %}</ul>
+    </article>
+    <article class="card panel">
+      <div class="panel-title"><div><h3>Os 5 mais fortes</h3></div></div>
+      <ul class="rank-list">{% for pokemon in mais_fortes %}<li><span><a href="{% url 'detalhes_pokemon' pokemon.pk %}">#{{ pokemon.id_pokemon|stringformat:"03d" }} {{ pokemon.nome|title }}</a><small>Soma dos atributos</small></span><strong>{{ pokemon.soma }}</strong></li>{% endfor %}</ul>
+    </article>
+  </div>
+  {% else %}
+  <div class="card empty-box">
+    <div class="empty-icon">◓</div>
+    <h2>Nada para relatar ainda</h2>
+    <p>O relatório é calculado a partir da sua coleção. Salve Pokémon para ver os indicadores.</p>
+    <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">Buscar Pokémon</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

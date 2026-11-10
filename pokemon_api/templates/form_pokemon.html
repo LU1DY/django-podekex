@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}Editar {{ pokemon.nome|title }} · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/form_pokemon.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="narrow-page">
+  <header class="page-header form-page-header">
+    <h1>Editar {{ pokemon.nome|title }}</h1>
+    <p>Os dados da espécie vêm da PokéAPI. Aqui você ajusta o que é seu.</p>
+  </header>
+
+  <form method="post" class="pokemon-form">
+    {% csrf_token %}
+    <div class="card form-section">
+      <div class="form-field">
+        <label for="{{ form.observacoes.id_for_label }}">Observações</label>
+        {{ form.observacoes }}
+        {% for erro in form.observacoes.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+      </div>
+    </div>
+
+    <div class="card form-section toggle-section">
+      <div class="toggle-row">
+        <div><strong>Capturado</strong></div>
+        <label class="switch">{{ form.capturado }}<span class="switch-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><strong>Favorito</strong></div>
+        <label class="switch">{{ form.favorito }}<span class="switch-track"></span></label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'listar_pokemons' %}" class="btn btn-secondary">Cancelar</a>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <a class="sidebar-logo" href="{% url 'home' %}">
+      <span class="brand-ball" aria-hidden="true"></span>
+      <div>
+        <h1>Pokédex</h1>
+        <span>Minha coleção de treinador</span>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav" aria-label="Navegação principal">
+      <a href="{% url 'home' %}" class="sidebar-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/></svg>
+        <span>Início</span>
+      </a>
+      <a href="{% url 'buscar_dados_pokemon' %}" class="sidebar-link{% if request.resolver_match.url_name == 'buscar_dados_pokemon' %} active{% endif %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        <span>Buscar Pokémon</span>
+      </a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'listar_pokemons' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_pokemons' or request.resolver_match.url_name == 'salvar_pokemon' or request.resolver_match.url_name == 'editar_pokemon' or request.resolver_match.url_name == 'detalhes_pokemon' %} active{% endif %}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c2.8-.9 5.4-.5 8 1.1v13c-2.6-1.6-5.2-2-8-1.1z"/><path d="M20 5.5c-2.8-.9-5.4-.5-8 1.1v13c2.6-1.6 5.2-2 8-1.1z"/></svg>
+          <span>Minha Coleção</span>
+        </a>
+        <a href="{% url 'consultas' %}" class="sidebar-link{% if request.resolver_match.url_name == 'consultas' %} active{% endif %}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
+          <span>Consultas</span>
+        </a>
+        <a href="{% url 'relatorio' %}" class="sidebar-link{% if request.resolver_match.url_name == 'relatorio' or request.resolver_match.url_name == 'exportar_relatorio' %} active{% endif %}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10"/><path d="M12 20V4"/><path d="M19 20v-7"/></svg>
+          <span>Relatório</span>
+        </a>
+        <a href="{% url 'perfil' %}" class="sidebar-link{% if request.resolver_match.url_name == 'perfil' or request.resolver_match.url_name == 'editar_perfil' %} active{% endif %}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.6 3.6-5.4 7-5.4s6.2 1.8 7 5.4"/></svg>
+          <span>Meu Perfil</span>
+        </a>
+      {% else %}
+      <a href="{% url 'login' %}" class="sidebar-link{% if request.resolver_match.url_name == 'login' %} active{% endif %}"><span>Entrar</span></a>
+      <a href="{% url 'registrar' %}" class="sidebar-link{% if request.resolver_match.url_name == 'registrar' %} active{% endif %}"><span>Cadastrar</span></a>
+      {% endif %}
+    </nav>
+  </div>
+
+  {% if user.is_authenticated %}
+  <div class="sidebar-trainer">
+    <a href="{% url 'perfil' %}" class="avatar" title="Meu perfil">{{ user.first_name|default:user.username|slice:":1"|upper }}</a>
+    <div class="trainer-copy">
+      <div class="name">{{ user.first_name|default:user.username }}</div>
+      <div class="detail">@{{ user.username }}</div>
+    </div>
+    <form method="post" action="{% url 'logout' %}" class="logout-form">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn" title="Sair" aria-label="Sair">⏻</button>
+    </form>
+  </div>
+  {% endif %}
+</aside>

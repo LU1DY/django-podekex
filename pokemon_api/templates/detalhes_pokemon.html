@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pokemon_extras %}
+{% block titulo %}{{ pokemon.nome|title }} · Detalhes · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/detalhes_pokemon.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="detail-page">
+  <header class="page-header detail-header">
+    <div>
+      <a href="{% url 'listar_pokemons' %}" class="back-link">← Voltar para a coleção</a>
+      <h1>Detalhes do Pokémon</h1>
+      <p>Dados do Pokémon salvo na sua coleção.</p>
+    </div>
+    <div class="detail-actions">
+      <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-primary">Editar dados</a>
+    </div>
+  </header>
+
+  <article class="card detail-hero">
+    <div class="detail-image dotted-surface">
+      {% if pokemon.sprite_url %}<img src="{{ pokemon.sprite_url }}" alt="{{ pokemon.nome }}" />{% else %}<span class="sprite-placeholder">?</span>{% endif %}
+    </div>
+
+    <div class="detail-info">
+      <span class="detail-number">#{{ pokemon.id_pokemon|stringformat:"03d" }}</span>
+      <h2>{{ pokemon.nome }}</h2>
+
+      <div class="detail-tags">
+        {% for tipo in pokemon.tipos %}
+          <span class="type-badge"><span class="dot" style="background: {{ tipo|cor_tipo }};"></span>{{ tipo|title }}</span>
+        {% empty %}
+          <span class="type-badge muted">Sem tipo</span>
+        {% endfor %}
+        {% if pokemon.regiao %}<span class="region-chip">{{ pokemon.regiao.nome }}</span>{% endif %}
+        <span class="poke-card-status {% if pokemon.capturado %}captured{% else %}not-captured{% endif %}">{% if pokemon.capturado %}✓ Capturado{% else %}○ Não capturado{% endif %}</span>
+        {% if pokemon.favorito %}<span class="poke-card-status favorite-tag">♥ Favorito</span>{% endif %}
+      </div>
+
+      <div class="detail-meta">
+        <div class="detail-meta-item"><span>Altura</span><strong>{{ pokemon.altura|default:"—" }}</strong></div>
+        <div class="detail-meta-item"><span>Peso</span><strong>{{ pokemon.peso|default:"—" }}</strong></div>
+        <div class="detail-meta-item"><span>Adicionado em</span><strong>{{ pokemon.data_captura|date:"d/m/Y" }}</strong></div>
+        <div class="detail-meta-item"><span>Total de atributos</span><strong>{{ total_atributos }}</strong></div>
+      </div>
+
+      <div class="detail-stats">
+        <div class="stat-bar"><div class="stat-bar-labels"><span>HP</span><strong>{{ pokemon.hp }}</strong></div><div class="stat-bar-track"><div class="stat-bar-fill" style="width: {% widthratio pokemon.hp 150 100 %}%;"></div></div></div>
+        <div class="stat-bar"><div class="stat-bar-labels"><span>Ataque</span><strong>{{ pokemon.ataque }}</strong></div><div class="stat-bar-track"><div class="stat-bar-fill" style="width: {% widthratio pokemon.ataque 150 100 %}%;"></div></div></div>
+        <div class="stat-bar"><div class="stat-bar-labels"><span>Defesa</span><strong>{{ pokemon.defesa }}</strong></div><div class="stat-bar-track"><div class="stat-bar-fill" style="width: {% widthratio pokemon.defesa 150 100 %}%;"></div></div></div>
+        <div class="stat-bar"><div class="stat-bar-labels"><span>Velocidade</span><strong>{{ pokemon.velocidade }}</strong></div><div class="stat-bar-track"><div class="stat-bar-fill" style="width: {% widthratio pokemon.velocidade 150 100 %}%;"></div></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card detail-panel">
+    <div class="panel-heading"><div><h3>Habilidades</h3></div></div>
+    {% if vinculos %}
+      <ul class="ability-list">
+        {% for vinculo in vinculos %}
+        <li>
+          <div class="ability-main">{{ vinculo.habilidade.nome|nome_exibicao }}</div>
+          <div class="ability-flags">
+            <span class="flag {% if vinculo.oculta %}flag-hidden{% endif %}">{% if vinculo.oculta %}Oculta{% else %}Normal{% endif %}</span>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="panel-empty"><p>Nenhuma habilidade registrada.</p></div>
+    {% endif %}
+  </article>
+
+  {% if pokemon.observacoes %}
+  <article class="card detail-panel notes-panel">
+    <div class="panel-heading"><div><span class="eyebrow">ANOTAÇÕES</span><h3>Observações</h3></div></div>
+    <p class="notes-text">{{ pokemon.observacoes|linebreaksbr }}</p>
+  </article>
+  {% endif %}
+</section>
+{% endblock %}

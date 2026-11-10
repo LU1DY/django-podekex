@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pokemon_extras %}
+{% block titulo %}Consultas · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/consultas.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="query-page">
+  <header class="page-header toolbar-header">
+    <div>
+      <h1>Consultas</h1>
+      <p>Combine filtros para encontrar Pokémon da sua coleção.</p>
+    </div>
+    <a href="{% url 'relatorio' %}" class="btn btn-secondary">Ver relatório</a>
+  </header>
+
+  <form method="get" action="{% url 'consultas' %}" class="card query-form" novalidate>
+    <div class="query-grid">
+      <label class="field field-wide"><span>{{ form.q.label }}</span>{{ form.q }}</label>
+      <label class="field"><span>{{ form.tipo.label }}</span>{{ form.tipo }}</label>
+      <label class="field"><span>{{ form.regiao.label }}</span>{{ form.regiao }}</label>
+      <label class="field"><span>{{ form.data_inicio.label }}</span>{{ form.data_inicio }}</label>
+      <label class="field"><span>{{ form.data_fim.label }}</span>{{ form.data_fim }}</label>
+    </div>
+
+    {% if form.errors %}
+    <ul class="form-errors" role="alert">
+      {% for campo in form %}{% for erro in campo.errors %}<li>{{ campo.label }}: {{ erro }}</li>{% endfor %}{% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="query-actions">
+      <button type="submit" class="btn btn-primary">Consultar</button>
+      {% if filtrando %}<a href="{% url 'consultas' %}" class="btn btn-soft">Limpar filtros</a>{% endif %}
+    </div>
+  </form>
+
+  {% if pokemons %}
+    <div class="section-title">
+      <h2>Resultados</h2>
+      <span class="count-pill">{{ pokemons|length }}</span>
+    </div>
+
+    <div class="card table-card">
+      <table class="data-table">
+        <thead>
+          <tr><th>Pokémon</th><th>Tipos</th><th>Região</th><th>Adicionado em</th><th>Situação</th></tr>
+        </thead>
+        <tbody>
+          {% for pokemon in pokemons %}
+          <tr>
+            <td>
+              <a class="pokemon-cell" href="{% url 'detalhes_pokemon' pokemon.pk %}">
+                {% if pokemon.sprite_url %}<img src="{{ pokemon.sprite_url }}" alt="" loading="lazy" />{% else %}<span class="thumb-placeholder">?</span>{% endif %}
+                <span class="pokemon-cell-number">#{{ pokemon.id_pokemon|stringformat:"03d" }}</span>
+                <strong>{{ pokemon.nome }}</strong>{% if pokemon.favorito %} <span class="fav-mark" title="Favorito">♥</span>{% endif %}
+              </a>
+            </td>
+            <td>{% for tipo in pokemon.tipos %}<span class="type-badge"><span class="dot" style="background: {{ tipo|cor_tipo }};"></span>{{ tipo|title }}</span> {% endfor %}</td>
+            <td class="muted-cell">{{ pokemon.regiao.nome|default:"—" }}</td>
+            <td class="muted-cell">{{ pokemon.data_captura|date:"d/m/Y" }}</td>
+            <td><span class="flag {% if pokemon.capturado %}flag-ok{% endif %}">{% if pokemon.capturado %}Capturado{% else %}Não capturado{% endif %}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card empty-box">
+      <div class="empty-icon">⌕</div>
+      <h2>Nenhum resultado</h2>
+      <p>{% if filtrando %}Nenhum Pokémon da sua coleção atende a esses filtros.{% else %}Sua coleção ainda está vazia. Busque um Pokémon para começar.{% endif %}</p>
+      {% if filtrando %}<a href="{% url 'consultas' %}" class="btn btn-soft">Limpar filtros</a>{% else %}<a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">Buscar Pokémon</a>{% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

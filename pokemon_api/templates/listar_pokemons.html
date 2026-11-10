@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titulo %}Minha Coleção · Pokédex{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/listar_pokemons.css' %}">{% endblock %}
+
+{% block conteudo %}
+<section class="collection-page">
+  <header class="page-header collection-header">
+    <div>
+      <h1>Minha Coleção</h1>
+      <p>{{ pokemons|length }} Pokémon salvo{{ pokemons|length|pluralize }}</p>
+    </div>
+    <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">+ Adicionar Pokémon</a>
+  </header>
+
+  {% if pokemons %}
+    <div class="collection-grid">
+      {% for pokemon in pokemons %}
+        {% include 'includes/_pokemon_card.html' %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty-state">
+      <div class="empty-icon">◓</div>
+      <h2>Nenhum Pokémon por aqui</h2>
+      <p>Sua coleção está vazia. Busque um Pokémon na PokéAPI e salve-o.</p>
+      <a href="{% url 'buscar_dados_pokemon' %}" class="btn btn-primary">Buscar Pokémon</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

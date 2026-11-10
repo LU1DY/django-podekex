@@ -1,0 +1,24 @@
+{% extends 'base_auth.html' %}
+{% block titulo %}Criar conta · Pokédex{% endblock %}
+{% block conteudo %}
+<h2>Criar conta</h2>
+<p class="auth-sub">Cada treinador tem a sua própria coleção.</p>
+
+<form method="post" class="pokemon-form" novalidate>
+  {% csrf_token %}
+  {% for erro in form.non_field_errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+
+  {% for campo in form %}
+  <div class="form-field">
+    <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+    {{ campo }}
+    {% for erro in campo.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    {% if campo.help_text %}<span class="field-hint">{{ campo.help_text|safe }}</span>{% endif %}
+  </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary auth-submit">Criar conta</button>
+</form>
+
+<p class="auth-foot">Já tem conta? <a href="{% url 'login' %}">Entrar</a></p>
+{% endblock %}

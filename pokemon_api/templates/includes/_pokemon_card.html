@@ -1,0 +1,47 @@
+{% load pokemon_extras %}
+
+<article class="card poke-card">
+  <div class="poke-card-visual">
+    <div class="poke-card-top">
+      <span class="poke-card-number">#{{ pokemon.id_pokemon|stringformat:"03d" }}</span>
+      <span class="poke-card-favorite{% if pokemon.favorito %} is-favorite{% endif %}">{% if pokemon.favorito %}♥{% else %}♡{% endif %}</span>
+    </div>
+    <div class="poke-card-image">
+      {% if pokemon.sprite_url %}
+        <img src="{{ pokemon.sprite_url }}" alt="{{ pokemon.nome }}" loading="lazy" />
+      {% else %}
+        <span class="sprite-placeholder">?</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="poke-card-body">
+    <div class="poke-card-heading">
+      <h3 class="poke-card-name"><a href="{% url 'detalhes_pokemon' pokemon.pk %}">{{ pokemon.nome }}</a></h3>
+      {% if pokemon.regiao %}<span class="region-chip">{{ pokemon.regiao.nome }}</span>{% endif %}
+    </div>
+
+    <div class="poke-card-types">
+      {% for tipo in pokemon.tipos %}
+        <span class="type-badge"><span class="dot" style="background: {{ tipo|cor_tipo }};"></span>{{ tipo|title }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="poke-card-meta">
+      <span class="poke-card-status {% if pokemon.capturado %}captured{% else %}not-captured{% endif %}">
+        {% if pokemon.capturado %}✓ Capturado{% else %}○ Não capturado{% endif %}
+      </span>
+    </div>
+
+    {% if not compacto %}
+      <div class="poke-card-actions">
+        <a href="{% url 'detalhes_pokemon' pokemon.pk %}" class="btn btn-soft card-main-action">Ver detalhes</a>
+        <a href="{% url 'editar_pokemon' pokemon.pk %}" class="btn btn-secondary">Editar</a>
+        <form action="{% url 'remover_pokemon' pokemon.pk %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn-icon danger" aria-label="Excluir {{ pokemon.nome }}" onclick="return confirm('Remover {{ pokemon.nome }} da sua coleção?')">×</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</article>
